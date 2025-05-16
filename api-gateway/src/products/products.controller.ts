@@ -8,8 +8,14 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
-import { PaginationOptions } from 'src/users/utils/types';
+import { Roles } from 'src/auth/decorator/roles.decorator';
+import { AdminGuard } from 'src/auth/guards/admin.guard';
+import { JwtAuthGuard } from 'src/auth/guards/JwtAuth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { SuperAdminGuard } from 'src/auth/guards/super-admin.guard';
+import { PaginationOptions, UserRole } from 'src/users/utils/types';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductsService } from './products.service';
@@ -19,6 +25,7 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
+  @Roles(UserRole.ADMIN, UserRole.SELLER)
   create(@Body() createProductDto: CreateProductDto) {
     return this.productsService.create(createProductDto);
   }
@@ -27,13 +34,15 @@ export class ProductsController {
   findAll(@Query() query: PaginationOptions) {
     return this.productsService.findAll(query);
   }
-
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.productsService.findOne(id);
   }
 
   @Patch(':id')
+  @UseGuards(AdminGuard)
+  @UseGuards(SuperAdminGuard)
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateProductDto: UpdateProductDto,
@@ -42,6 +51,8 @@ export class ProductsController {
   }
 
   @Delete(':id')
+  @UseGuards(SuperAdminGuard, JwtAuthGuard, RolesGuard)
+  @UseGuards(AdminGuard)
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.productsService.remove(id);
   }
