@@ -24,7 +24,11 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
   @MessagePattern({ cmd: USER_PATTERNS.FindByEmail })
-  findByEmail(@Payload() email: string) {
+  findByEmail(@Payload() { email }: { email: string }) {
+    console.log('users-microservice');
+    console.log(email);
+    console.log(typeof email);
+
     return this.usersService.findByEmail(email);
   }
 
