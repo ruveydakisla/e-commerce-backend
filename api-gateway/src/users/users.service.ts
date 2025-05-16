@@ -11,6 +11,8 @@ export class UsersService {
     private readonly usersMicroservice: ClientProxy,
   ) {}
   create(createUserDto: CreateUserDto) {
+    console.log('api-gateway user service');
+
     return this.usersMicroservice.send(
       { cmd: USER_PATTERNS.Create },
       createUserDto,
@@ -36,7 +38,7 @@ export class UsersService {
   update(id: number, updateUserDto: UpdateUserDto) {
     return this.usersMicroservice.send(
       { cmd: USER_PATTERNS.Update },
-      updateUserDto,
+      { id, updateUserDto },
     );
   }
 
