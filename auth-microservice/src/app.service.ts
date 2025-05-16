@@ -8,7 +8,7 @@ import { JwtPayload } from './utils/types';
 export class AppService {
   constructor(
     private readonly jwtService: JwtService,
-    @Inject('USERS_MICROSERVİCE') private usersMicroservice: ClientProxy,
+    @Inject('USERS_MICROSERVICE') private usersMicroservice: ClientProxy,
   ) {}
 
   async validateUser(email: string, password: string) {
