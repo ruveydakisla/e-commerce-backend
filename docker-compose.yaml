@@ -159,6 +159,8 @@ services:
       - users-microservice
       - auth-microservice
       - products-microservice
+      - cart-microservice
+      - orders-microservice
     volumes:
       - ./api-gateway:/app
       - /app/node_modules
