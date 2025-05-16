@@ -11,7 +11,7 @@ async function bootstrap() {
 
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     AppModule,
-    { transport: Transport.TCP, options: { port: port, host: host } },
+    { transport: Transport.TCP, options: { port: 3020, host: '0.0.0.0' } },
   );
   await app.listen();
   console.log('Users microsevice 3020 portunda çalışıyor...');
