@@ -1,7 +1,14 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationOptions, UserRole } from 'src/utils/types';
-import { EntityManager, Repository } from 'typeorm';
+import { EntityManager, EntityNotFoundError, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserResponseDto } from './dto/user-response.dto';
@@ -35,7 +42,6 @@ export class UsersService {
       .skip(offset)
       .take(limit)
       .getMany();
-    console.log(users);
     return users.map(
       (user) =>
         new UserResponseDto({
@@ -48,21 +54,34 @@ export class UsersService {
   }
 
   async findOne(id: number): Promise<UserResponseDto> {
-    const user = await this.userRepository.findOne({
-      where: { id },
-    });
-    const userResponse = new UserResponseDto({
-      id: user?.id,
-      name: user?.name,
-      email: user?.email,
-      birthDate: user?.birthdate,
-      role: UserRole[user?.role ?? ''],
-    });
+    try {
+      const user = await this.userRepository.findOneOrFail({
+        where: { id },
+      });
 
-    if (!user) {
-      throw new NotFoundException(`Kullanıcı bulunamadı. ID: ${id}`);
+      return new UserResponseDto({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        birthDate: user.birthdate,
+        role: UserRole[user.role ?? ''],
+      });
+    } catch (error) {
+      if (error instanceof EntityNotFoundError) {
+        // Kullanıcı bulunamadığında, NotFoundException yerine RpcException döndürelim
+        throw new RpcException({
+          status: 'error',
+          message: `Kullanıcı bulunamadı. ID: ${id}`,
+        });
+      }
+
+      // Diğer hatalar için genel bir mesaj döndür
+      console.error(`Kullanıcı aranırken hata oluştu: ${error.message}`);
+      throw new RpcException({
+        status: 'error',
+        message: 'Bir hata oluştu, lütfen tekrar deneyiniz.',
+      });
     }
-    return userResponse;
   }
 
   async findByEmail(email: string): Promise<User | null> {
@@ -74,10 +93,12 @@ export class UsersService {
     id: number,
     updatedUser: UpdateUserDto,
   ): Promise<UserResponseDto> {
-    const result = await this.userRepository.update(id, updatedUser);
-    if (result.affected === 0) {
+    const user = this.findOne(id);
+    if (!user) {
       throw new NotFoundException(`Kullanıcı bulunamadı: ${id}`);
     }
+    const result = await this.userRepository.update(id, updatedUser);
+
     const userResponse = new UserResponseDto({
       id: id,
       name: updatedUser.name,
@@ -87,7 +108,15 @@ export class UsersService {
     return userResponse;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number) {
+    const user = this.findOne(id);
+    if (!user) {
+      throw new HttpException('User Not Found', HttpStatus.BAD_REQUEST);
+    }
+    const result = await this.userRepository.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException(`Kullanıcı bulunamadı. ID: ${id}`);
+    }
+    return user;
   }
 }

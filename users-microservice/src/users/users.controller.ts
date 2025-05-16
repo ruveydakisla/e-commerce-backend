@@ -20,7 +20,7 @@ export class UsersController {
   }
 
   @MessagePattern({ cmd: USER_PATTERNS.FindOne })
-  findOne(@Payload() id: number) {
+  findOne(@Payload() { id }: { id: number }) {
     return this.usersService.findOne(id);
   }
   @MessagePattern({ cmd: USER_PATTERNS.FindByEmail })
@@ -33,11 +33,12 @@ export class UsersController {
     @Payload()
     { id, updateUserDto }: { id: number; updateUserDto: UpdateUserDto },
   ) {
+    console.log('users-microservice->controller id:', id, 'typeof:', typeof id);
     return this.usersService.update(id, updateUserDto);
   }
 
   @MessagePattern({ cmd: USER_PATTERNS.Remove })
-  remove(@Payload() id: number) {
+  remove(@Payload() { id }: { id: number }) {
     return this.usersService.remove(id);
   }
 }
