@@ -126,6 +126,17 @@ services:
     volumes:
       - ./auth-microservice:/app
       - /app/node_modules
+  cart-microservice:
+    build:
+      context: ./cart-microservice
+      dockerfile: Dockerfile
+    depends_on:
+      - mongo
+    networks:
+      - aye-network
+    volumes:
+      - ./cart-microservice:/app
+      - /app/node_modules
 
   mongo:
     image: mongo
