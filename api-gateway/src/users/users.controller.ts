@@ -8,11 +8,16 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
+import { Roles } from 'src/auth/decorator/roles.decorator';
+import { JwtAuthGuard } from 'src/auth/guards/JwtAuth.guard';
+import { OwnerOrRolesGuard } from 'src/auth/guards/owner-or-roles.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
-import { PaginationOptions } from './utils/types';
+import { PaginationOptions, UserRole } from './utils/types';
 
 @Controller('users')
 export class UsersController {
@@ -24,26 +29,31 @@ export class UsersController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN)
   findAll(@Query() query: PaginationOptions) {
-
     return this.usersService.findAll(query);
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.findOne(id);
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard, OwnerOrRolesGuard)
+  @Roles(UserRole.SUPER_ADMIN)
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-
     return this.usersService.update(id, updateUserDto);
   }
 
   @Delete(':id')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.SELLER)
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.remove(id);
   }
