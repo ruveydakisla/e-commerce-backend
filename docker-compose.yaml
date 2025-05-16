@@ -14,6 +14,36 @@ services:
     networks:
       - aye-network
 
+  orders-pg-db:
+    image: postgres:16
+    container_name: orders-pg-db
+    restart: always
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_USER: ${ORDERS_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${ORDERS_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${ORDERS_POSTGRES_DB}
+    volumes:
+      - orders-pg-db:/var/lib/postgresql/data
+    networks:
+      - aye-network
+
+  products-pg-db:
+    image: postgres:16
+    container_name: products-pg-db
+    restart: always
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: ${PRODUCTS_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${PRODUCTS_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${PRODUCTS_POSTGRES_DB}
+    volumes:
+      - products-pg-db:/var/lib/postgresql/data
+    networks:
+      - aye-network
+
   pgadmin:
     container_name: pgadmin_container
     image: dpage/pgadmin4
@@ -35,9 +65,9 @@ services:
       context: ./users-microservice
       dockerfile: Dockerfile
     depends_on:
-    - users-pg-db
+      - users-pg-db
     networks:
-    - aye-network
+      - aye-network
     environment:
       USERS_POSTGRES_HOST: ${USERS_POSTGRES_HOST}
       USERS_POSTGRES_PORT: ${USERS_POSTGRES_PORT}
@@ -45,15 +75,57 @@ services:
       USERS_POSTGRES_PASSWORD: ${USERS_POSTGRES_PASSWORD}
       USERS_POSTGRES_DB: ${USERS_POSTGRES_DB}
       TYPEORM_CACHE_DURATION: ${TYPEORM_CACHE_DURATION}
-    
+    volumes:
+      - ./users-microservice:/app
+      - /app/node_modules
+  products-microservice:
+    build:
+      context: ./products-microservice
+      dockerfile: Dockerfile
+    depends_on:
+      - products-pg-db
+    networks:
+      - aye-network
+    environment:
+      PRODUCTS_POSTGRES_HOST: ${PRODUCTS_POSTGRES_HOST}
+      PRODUCTS_POSTGRES_PORT: ${PRODUCTS_POSTGRES_PORT}
+      PRODUCTS_POSTGRES_USER: ${PRODUCTS_POSTGRES_USER}
+      PRODUCTS_POSTGRES_PASSWORD: ${PRODUCTS_POSTGRES_PASSWORD}
+      PRODUCTS_POSTGRES_DB: ${PRODUCTS_POSTGRES_DB}
+      TYPEORM_CACHE_DURATION: ${TYPEORM_CACHE_DURATION}
+    volumes:
+      - ./products-microservice:/app
+      - /app/node_modules
+  orders-microservice:
+    build:
+      context: ./orders-microservice
+      dockerfile: Dockerfile
+    depends_on:
+      - orders-pg-db
+    networks:
+      - aye-network
+    environment:
+      ORDERS_POSTGRES_HOST: ${ORDERS_POSTGRES_HOST}
+      ORDERS_POSTGRES_PORT: ${ORDERS_POSTGRES_PORT}
+      ORDERS_POSTGRES_USER: ${ORDERS_POSTGRES_USER}
+      ORDERS_POSTGRES_PASSWORD: ${ORDERS_POSTGRES_PASSWORD}
+      ORDERS_POSTGRES_DB: ${ORDERS_POSTGRES_DB}
+      TYPEORM_CACHE_DURATION: ${TYPEORM_CACHE_DURATION}
+    volumes:
+      - ./products-microservice:/app
+      - /app/node_modules
   auth-microservice:
     build:
       context: ./auth-microservice
       dockerfile: Dockerfile
     depends_on:
       - users-pg-db
+      - users-microservice
     networks:
       - aye-network
+    volumes:
+      - ./auth-microservice:/app
+      - /app/node_modules
   api-gateway:
     build:
       context: ./api-gateway
@@ -65,6 +137,10 @@ services:
     depends_on:
       - users-microservice
       - auth-microservice
+      - products-microservice
+    volumes:
+      - ./api-gateway:/app
+      - /app/node_modules
 
 networks:
   aye-network:
@@ -73,3 +149,5 @@ networks:
 volumes:
   users-pg-db:
   pgadmin:
+  products-pg-db:
+  orders-pg-db:
