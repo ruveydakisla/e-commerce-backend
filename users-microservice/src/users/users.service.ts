@@ -1,6 +1,6 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PaginationOptions } from 'src/utils/types';
+import { PaginationOptions, UserRole } from 'src/utils/types';
 import { EntityManager, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -14,10 +14,12 @@ export class UsersService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
   private readonly logger = new Logger(UsersService.name);
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  async create(CreateUserDto: CreateUserDto) {
+    const newUser = new User(CreateUserDto);
+    const savedUser = await this.entityManager.save(User, newUser);
+    this.logger.log(`kullanıcı oluşturuldu:${savedUser.id}`);
+    return savedUser;
   }
-
   async findAll({
     limit = 5,
     order = 'asc',
@@ -45,15 +47,44 @@ export class UsersService {
     );
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: number): Promise<UserResponseDto> {
+    const user = await this.userRepository.findOne({
+      where: { id },
+    });
+    const userResponse = new UserResponseDto({
+      id: user?.id,
+      name: user?.name,
+      email: user?.email,
+      birthDate: user?.birthdate,
+      role: UserRole[user?.role ?? ''],
+    });
+
+    if (!user) {
+      throw new NotFoundException(`Kullanıcı bulunamadı. ID: ${id}`);
+    }
+    return userResponse;
   }
+
   async findByEmail(email: string): Promise<User | null> {
     this.logger.log(`finding user by email:${email}`);
     return this.userRepository.findOne({ where: { email } });
   }
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+
+  async update(
+    id: number,
+    updatedUser: UpdateUserDto,
+  ): Promise<UserResponseDto> {
+    const result = await this.userRepository.update(id, updatedUser);
+    if (result.affected === 0) {
+      throw new NotFoundException(`Kullanıcı bulunamadı: ${id}`);
+    }
+    const userResponse = new UserResponseDto({
+      id: id,
+      name: updatedUser.name,
+      email: updatedUser?.email,
+      birthDate: updatedUser?.birthdate,
+    });
+    return userResponse;
   }
 
   remove(id: number) {
