@@ -5,35 +5,51 @@ import { LoginDto } from './dto/login.dto';
 import { JwtPayload } from './utils/types';
 
 @Injectable()
-export class AppService {
+export class AuhtService {
   constructor(
     private readonly jwtService: JwtService,
-    @Inject('USERS_MICROSERVICE') private usersMicroservice: ClientProxy,
+    @Inject('USERS_MICROSERVICE')
+    private readonly usersMicroservice: ClientProxy,
   ) {}
 
   async validateUser(email: string, password: string) {
-    //db'den kullanıcıyı bul
+    try {
+      console.log('validate user dayım');
 
-    const user: any = this.usersMicroservice.send(
-      { cmd: 'Users.FindByEmail' },
-      email,
-    );
-    if (!user || user.password !== password) {
-      throw new UnauthorizedException();
+      const user: any = this.usersMicroservice.send(
+        { cmd: 'Users.FindByEmail' },
+        { email },
+      );
+      if (user && password === user.password) {
+        const { password, ...result } = user;
+        return result;
+      }
+      return null;
+    } catch (error) {
+      console.log(error);
     }
-    return user;
   }
-
   async login(loginDto: LoginDto) {
+    console.log('auth-service service teyim');
+
+    console.log(loginDto);
+
     const user = await this.validateUser(loginDto.email, loginDto.password);
+    if (!user || loginDto.password !== user.password) {
+      throw new UnauthorizedException('Geçersiz e-posta veya şifre');
+    }
     const payload: JwtPayload = {
-      sub: user.sub,
       email: user.email,
+      sub: user.sub,
       role: user.role,
     };
     return {
       access_token: this.jwtService.sign(payload),
-      user,
+      user: {
+        id: user.sub,
+        email: user.email,
+        role: user.role,
+      },
     };
   }
 

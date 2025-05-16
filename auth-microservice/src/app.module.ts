@@ -3,7 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import {  AuhtService } from './app.service';
 
 @Module({
   imports: [
@@ -20,14 +20,11 @@ import { AppService } from './app.service';
       {
         name: 'USERS_MICROSERVICE',
         transport: Transport.TCP,
-        options: {
-          host: 'users-microservice',
-          port: 3020,
-        },
+        options: { port: 3020, host: 'users-microservice' },
       },
     ]),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AuhtService],
 })
 export class AppModule {}

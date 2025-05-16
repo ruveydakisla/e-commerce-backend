@@ -1,11 +1,10 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { AppService } from './app.service';
-import { UserRole } from './utils/types';
+import { AuhtService } from './app.service';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(private readonly appService: AuhtService) {}
 
   @MessagePattern({ cmd: 'auth.login' })
   login(
@@ -13,10 +12,11 @@ export class AppController {
     data: {
       email: string;
       password: string;
-      role: UserRole;
-      sub: number;
     },
   ) {
+    console.log('auth.login->data:');
+    console.log(data);
+
     return this.appService.login(data);
   }
 
