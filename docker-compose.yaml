@@ -144,7 +144,7 @@ services:
     ports:
       - "27017:27017"
     networks:
-      - commerce-network
+      - aye-network
     volumes:
       - mongo-data:/data/db
   api-gateway:
