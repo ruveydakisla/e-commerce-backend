@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { Roles } from 'src/auth/decorator/roles.decorator';
@@ -27,12 +28,20 @@ export class UsersController {
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
-
-  @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.SUPER_ADMIN)
+  @Get()
   findAll(@Query() query: PaginationOptions) {
     return this.usersService.findAll(query);
+  }
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  findMe(@Req() req) {
+    const sub = req.user.sub;
+    if (!sub) {
+      return { message: 'User not found' };
+    }
+    return this.usersService.findOne(sub);
   }
 
   @Get(':id')
