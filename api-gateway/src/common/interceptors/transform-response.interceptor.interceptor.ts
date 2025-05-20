@@ -1,38 +1,48 @@
 import {
-  ArgumentsHost,
-  Catch,
-  ExceptionFilter,
-  HttpException,
-  HttpStatus,
+  CallHandler,
+  ExecutionContext,
+  Injectable,
+  NestInterceptor,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Observable, catchError, map, throwError } from 'rxjs';
+import { Request } from 'express';
+import { HttpException, HttpStatus } from '@nestjs/common';
 
-@Catch()
-export class TransformResponseInterceptor implements ExceptionFilter {
-  catch(exception: unknown, host: ArgumentsHost) {
-    const ctx = host.switchToHttp();
-    const response = ctx.getResponse<Response>();
+@Injectable()
+export class TransformResponseInterceptor implements NestInterceptor {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    const ctx = context.switchToHttp();
     const request = ctx.getRequest<Request>();
 
-    const status =
-      exception instanceof HttpException
-        ? exception.getStatus()
-        : HttpStatus.INTERNAL_SERVER_ERROR;
+    return next.handle().pipe(
+      map((data) => ({
+        success: true,
+        timestamp: new Date().toISOString(),
+        path: request.url,
+        data,
+      })),
+      catchError((err) => {
+        const status =
+          err instanceof HttpException
+            ? err.getStatus()
+            : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    const message =
-      exception instanceof HttpException
-        ? exception.getResponse()
-        : 'Internal server error';
+        const responseMessage =
+          err instanceof HttpException ? err.getResponse() : err;
 
-    const errorMessage =
-      typeof message === 'string'
-        ? message
-        : (message as any)?.message || 'Unexpected error occurred';
+        const message =
+          typeof responseMessage === 'string'
+            ? responseMessage
+            : (responseMessage as any)?.message || 'Internal server error';
 
-    response.status(status).json({
-      success: false,
-      timestamp: new Date().toISOString(),
-      message: errorMessage,
-    });
+        return throwError(() => ({
+          statusCode: status,
+          success: false,
+          timestamp: new Date().toISOString(),
+          path: request.url,
+          message,
+        }));
+      }),
+    );
   }
 }
