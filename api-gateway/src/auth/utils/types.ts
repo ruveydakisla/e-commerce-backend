@@ -14,3 +14,7 @@ export interface RequestWithUser extends Request {
   user?: RequestUser;
   params: { id: number };
 }
+export const AUTH_PATTERNS = {
+  login: 'Auth.Login',
+  verify: 'Auth.Verify',
+};

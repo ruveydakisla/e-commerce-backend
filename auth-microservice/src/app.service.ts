@@ -1,6 +1,7 @@
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
+import { firstValueFrom } from 'rxjs';
 import { LoginDto } from './dto/login.dto';
 import { JwtPayload } from './utils/types';
 
@@ -14,33 +15,61 @@ export class AuhtService {
 
   async validateUser(email: string, password: string) {
     try {
-      console.log('validate user dayım');
-
-      const user: any = this.usersMicroservice.send(
-        { cmd: 'Users.FindByEmail' },
-        { email },
+      const user: any = await firstValueFrom(
+        this.usersMicroservice.send({ cmd: 'Users.FindByEmail' }, { email }),
       );
-      if (user && password === user.password) {
-        const { password, ...result } = user;
-        return result;
+
+      if (!user) {
+        throw new UnauthorizedException('Kullanıcı bulunamadı.');
       }
-      return null;
+
+    
+      if (password !== user.password) {
+        throw new UnauthorizedException('Geçersiz şifre');
+      }
+
+      return user;
     } catch (error) {
-      console.log(error);
+      if (error instanceof RpcException) {
+        const err = error.getError();
+        let message = 'Bilinmeyen hata';
+
+        if (typeof err === 'string') {
+          message = err;
+        } else if (
+          typeof err === 'object' &&
+          err !== null &&
+          'message' in err
+        ) {
+          message = (err as any).message;
+        }
+
+        throw new UnauthorizedException(message);
+      }
+
+      throw new UnauthorizedException(
+        'Kullanıcı doğrulama sırasında hata oluştu',
+      );
     }
   }
   async login(loginDto: LoginDto) {
-    console.log('auth-service service teyim');
+    const user: any = await this.validateUser(
+      loginDto.email,
+      loginDto.password,
+    );
+    console.log(user);
 
-    console.log(loginDto);
-
-    const user = await this.validateUser(loginDto.email, loginDto.password);
     if (!user || loginDto.password !== user.password) {
+      console.log('logindto', loginDto.password);
+      console.log('user password', user.password);
+
+      console.log('Geçersiz e-posta veya şifre');
+
       throw new UnauthorizedException('Geçersiz e-posta veya şifre');
     }
     const payload: JwtPayload = {
       email: user.email,
-      sub: user.sub,
+      sub: user.id,
       role: user.role,
     };
     return {
@@ -53,11 +82,15 @@ export class AuhtService {
     };
   }
 
-  verify(token: string) {
+  async verify(token: string) {
     try {
-      return this.jwtService.verify(token);
+      console.log('auth microservice verify token', token);
+      const verified = await this.jwtService.verify(token);
+      return verified;
     } catch (e) {
-      throw new UnauthorizedException();
+      console.log('jwt verify hatası', e);
+
+      return { message: 'jwt verify hatası', error: e };
     }
   }
 }

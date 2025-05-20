@@ -3,7 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AppController } from './app.controller';
-import {  AuhtService } from './app.service';
+import { AuhtService } from './app.service';
 
 @Module({
   imports: [
