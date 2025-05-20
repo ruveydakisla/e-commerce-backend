@@ -85,10 +85,21 @@ export class UsersService {
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    this.logger.log(`finding user by email:${email}`);
-    return this.userRepository.findOne({ where: { email } });
-  }
+    this.logger.log(`finding user by email: ${email}`);
+    const user = await this.userRepository.findOne({ where: { email } });
 
+    if (!user) {
+      this.logger.log(`user not found ! email: ${email}`);
+      
+      throw new RpcException({
+        status: 'error',
+        message: `Kullanıcı bulunamadı. Email: ${email}`,
+        statusCode: 404,
+      });
+    }
+
+    return user;
+  }
   async update(
     id: number,
     updatedUser: UpdateUserDto,
