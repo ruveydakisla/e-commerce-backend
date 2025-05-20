@@ -11,9 +11,15 @@ import { UsersService } from './users.service';
       {
         name: 'USERS_MICROSERVICE',
         transport: Transport.TCP,
-        options: { port: 3020 ,host:"users-microservice"},
+        options: { port: 3020, host: 'users-microservice' },
+      },
+      {
+        name: 'AUTH_MICROSERVICE',
+        transport: Transport.TCP,
+        options: { port: 3021, host: 'auth-microservice' },
       },
     ]),
   ],
+  exports: [UsersService],
 })
 export class UsersModule {}

@@ -13,6 +13,12 @@ import { CartService } from './cart.service';
         transport: Transport.TCP,
         options: { port: 3024, host: 'cart-microservice' },
       },
+
+      {
+        name: 'AUTH_MICROSERVICE',
+        transport: Transport.TCP,
+        options: { port: 3021, host: 'auth-microservice' },
+      },
     ]),
   ],
 })
