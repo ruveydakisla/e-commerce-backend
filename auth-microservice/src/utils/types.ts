@@ -11,3 +11,8 @@ export enum UserRole {
   USER = 3,
   GUEST = 4,
 }
+
+export const AUTH_PATTERNS = {
+  login: 'Auth.Login',
+  verify:'Auth.Verify'
+};
