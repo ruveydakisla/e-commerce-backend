@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { CreateCartDto } from './dto/create-cart.dto';
 import { UpdateCartDto } from './dto/update-cart.dto';
 import { CART_PATTERNS } from './utils/types';
+import { AddCartDto } from './dto/create-cart.dto';
 
 @Injectable()
 export class CartService {
@@ -10,7 +10,7 @@ export class CartService {
     @Inject('CART_MICROSERVICE')
     private readonly cartMicroservice: ClientProxy,
   ) {}
-  addToCart(createCartDto: CreateCartDto) {
+  addToCart(createCartDto: AddCartDto) {
     return this.cartMicroservice.send(
       { cmd: CART_PATTERNS.addToCart },
       createCartDto,
