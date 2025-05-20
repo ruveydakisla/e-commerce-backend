@@ -6,23 +6,33 @@ import {
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
+import { AUTH_PATTERNS } from '../utils/types';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-  constructor(@Inject('AUTH_SERVICE') private authMicroservice: ClientProxy) {}
+  constructor(
+    @Inject('AUTH_MICROSERVICE') private readonly authMicroservice: ClientProxy,
+  ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
+
     const authHeader = req.headers.authorization;
+
     if (!authHeader) return false;
 
     const token = authHeader.replace('Bearer ', '');
     try {
       const user = await firstValueFrom(
-        this.authMicroservice.send({ cmd: 'auth.verify' }, { token }),
+        this.authMicroservice.send({ cmd: AUTH_PATTERNS.verify }, token),
       );
-      req.user = user;
-      return true;
+
+      if ((req.user = user)) return true;
+      else {
+        return false;
+      }
     } catch (error) {
+      console.log('auth hatası:', error);
+
       return false;
     }
   }
