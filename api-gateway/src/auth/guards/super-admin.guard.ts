@@ -1,11 +1,11 @@
 import { RequestWithUser } from '@my/common/src/auth/types';
+import { UserRole } from '@my/common/src/users/constants';
 import {
   CanActivate,
   ExecutionContext,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { UserRole } from 'src/users/utils/types';
 
 @Injectable()
 export class SuperAdminGuard implements CanActivate {

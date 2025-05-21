@@ -1,3 +1,6 @@
+import { PaginationOptions } from '@my/common/src/common/types';
+import { UserRole } from '@my/common/src/users/constants';
+import { CreateUserDto, UpdateUserDto } from '@my/common/src/users/dto';
 import {
   Body,
   Controller,
@@ -15,11 +18,7 @@ import { Roles } from 'src/auth/decorator/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/JwtAuth.guard';
 import { OwnerOrRolesGuard } from 'src/auth/guards/owner-or-roles.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
-import { PaginationOptions, UserRole } from './utils/types';
-
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -64,8 +63,6 @@ export class UsersController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.SUPER_ADMIN, UserRole.SELLER)
   remove(@Param('id', ParseIntPipe) id: number) {
-
-
     return this.usersService.remove(id);
   }
 }
