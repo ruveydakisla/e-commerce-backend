@@ -1,0 +1,26 @@
+{
+  "name": "@my/common",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "version:patch": "standard-version --release-as patch -m \"common patch %s\"",
+    "update": "npm run build && npm run version:patch && npm run postversion",
+    "postversion": "npm run build && node ./scripts/update-dependents.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.21",
+    "standard-version": "^9.5.0"
+  }
+}
