@@ -1,3 +1,4 @@
+import { AddCartDto, UpdateCartDto } from '@my/common/src/cart/dto';
 import {
   Body,
   Controller,
@@ -11,8 +12,7 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/JwtAuth.guard';
 import { CartService } from './cart.service';
-import { AddCartDto } from './dto/create-cart.dto';
-import { UpdateCartDto } from './dto/update-cart.dto';
+
 @UseGuards(JwtAuthGuard)
 @Controller('cart')
 export class CartController {
