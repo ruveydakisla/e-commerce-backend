@@ -1,3 +1,9 @@
+import { PaginationOptions } from '@my/common/src/common/types';
+import {
+  CreateProductDto,
+  UpdateProductDto,
+} from '@my/common/src/products/dto';
+import { UserRole } from '@my/common/src/users/constants';
 import {
   Body,
   Controller,
@@ -15,9 +21,6 @@ import { AdminGuard } from 'src/auth/guards/admin.guard';
 import { JwtAuthGuard } from 'src/auth/guards/JwtAuth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { SuperAdminGuard } from 'src/auth/guards/super-admin.guard';
-import { PaginationOptions, UserRole } from 'src/users/utils/types';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductsService } from './products.service';
 
 @Controller('products')
@@ -28,8 +31,6 @@ export class ProductsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.SELLER)
   create(@Body() createProductDto: CreateProductDto) {
-
-
     return this.productsService.create(createProductDto);
   }
 
