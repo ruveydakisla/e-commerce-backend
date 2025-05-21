@@ -1,3 +1,4 @@
+import { SERVICES } from '@my/common/src/common/constants';
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { OrdersController } from './orders.controller';
@@ -7,9 +8,9 @@ import { OrdersService } from './orders.service';
   imports: [
     ClientsModule.register([
       {
-        name: 'ORDERS_MICROSERVICE',
+        name: SERVICES.ORDERS.name,
         transport: Transport.TCP,
-        options: { port: 3023, host: 'orders-microservice' },
+        options: { port: SERVICES.ORDERS.port, host: SERVICES.ORDERS.host },
       },
     ]),
   ],

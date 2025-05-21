@@ -1,3 +1,4 @@
+import { SERVICES } from '@my/common/src/common/constants';
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ProductsController } from './products.controller';
@@ -9,15 +10,15 @@ import { ProductsService } from './products.service';
   imports: [
     ClientsModule.register([
       {
-        name: 'PRODUCTS_MICROSERVICE',
+        name: SERVICES.PRODUCTS.name,
         transport: Transport.TCP,
-        options: { port: 3022, host: 'products-microservice' },
+        options: { port: SERVICES.PRODUCTS.port, host: SERVICES.PRODUCTS.host },
       },
 
       {
-        name: 'AUTH_MICROSERVICE',
+        name: SERVICES.AUTH.name,
         transport: Transport.TCP,
-        options: { port: 3021, host: 'auth-microservice' },
+        options: { port: SERVICES.AUTH.port, host: SERVICES.AUTH.host },
       },
     ]),
   ],

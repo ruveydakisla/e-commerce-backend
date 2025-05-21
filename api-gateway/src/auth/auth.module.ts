@@ -1,3 +1,4 @@
+import { SERVICES } from '@my/common/src/common/constants';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
@@ -9,7 +10,6 @@ import { JwtAuthGuard } from './guards/JwtAuth.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { SuperAdminGuard } from './guards/super-admin.guard';
 import { JwtStrategy } from './jwt/JwtStrategy';
-
 @Module({
   controllers: [AuthController],
   imports: [
@@ -17,9 +17,9 @@ import { JwtStrategy } from './jwt/JwtStrategy';
     UsersModule,
     ClientsModule.register([
       {
-        name: 'AUTH_MICROSERVICE',
+        name: SERVICES.AUTH.name,
         transport: Transport.TCP,
-        options: { port: 3021, host: 'auth-microservice' },
+        options: { port: SERVICES.AUTH.port, host: SERVICES.AUTH.host },
       },
     ]),
   ],
@@ -31,12 +31,6 @@ import { JwtStrategy } from './jwt/JwtStrategy';
     JwtAuthGuard,
     RolesGuard,
   ],
-  exports: [
-    AuthService,
-    AdminGuard,
-    SuperAdminGuard,
-    RolesGuard,
-    JwtAuthGuard,
-  ],
+  exports: [AuthService, AdminGuard, SuperAdminGuard, RolesGuard, JwtAuthGuard],
 })
 export class AuthModule {}
