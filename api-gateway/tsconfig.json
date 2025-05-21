@@ -10,6 +10,9 @@
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
+    "paths": {
+      "@my/common": ["../common/dist"]
+    },
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
