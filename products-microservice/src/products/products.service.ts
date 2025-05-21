@@ -1,4 +1,13 @@
 import {
+  PaginatedResult,
+  PaginationOptions,
+} from '@my/common/src/common/types';
+import {
+  CreateProductDto,
+  UpdateProductDto,
+} from '@my/common/src/products/dto';
+import { SortOrder } from '@my/common/src/users/constants';
+import {
   HttpException,
   HttpStatus,
   Injectable,
@@ -7,11 +16,8 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
-import { CreateProductDto } from './dto/create-product.dto';
 import { ProductResponseDTO } from './dto/product-response.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entities/product.entity';
-import { PaginatedResult, PaginationOptions, SortOrder } from './utils/types';
 
 @Injectable()
 export class ProductsService {

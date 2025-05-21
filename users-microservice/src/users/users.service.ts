@@ -1,3 +1,6 @@
+import { PaginationOptions } from '@my/common/src/common/types';
+import { UserRole } from '@my/common/src/users/constants';
+import { CreateUserDto, UpdateUserDto } from '@my/common/src/users/dto';
 import {
   HttpException,
   HttpStatus,
@@ -7,10 +10,7 @@ import {
 } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PaginationOptions, UserRole } from 'src/utils/types';
 import { EntityManager, EntityNotFoundError, Repository } from 'typeorm';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import { User } from './entities/user.entity';
 
@@ -33,8 +33,6 @@ export class UsersService {
     page = 0,
     sort = 'id',
   }: PaginationOptions) {
-    console.log('users-microservice/service');
-
     const offset = page * limit;
     const users = await this.userRepository
       .createQueryBuilder('user')
@@ -90,7 +88,7 @@ export class UsersService {
 
     if (!user) {
       this.logger.log(`user not found ! email: ${email}`);
-      
+
       throw new RpcException({
         status: 'error',
         message: `Kullanıcı bulunamadı. Email: ${email}`,

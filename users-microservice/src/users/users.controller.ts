@@ -1,9 +1,8 @@
 import { USER_PATTERNS } from '@my/common/src/common/constants';
+import { PaginationOptions } from '@my/common/src/common/types';
+import { CreateUserDto, UpdateUserDto } from '@my/common/src/users/dto';
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { PaginationOptions } from 'src/utils/types';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 @Controller()
 export class UsersController {

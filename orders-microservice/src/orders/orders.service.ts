@@ -1,9 +1,9 @@
+import { SERVICES } from '@my/common/src/common/constants';
+import { CreateOrderDto, UpdateOrderDto } from '@my/common/src/orders/dto';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderItem } from './entities/order-item.entity';
 import { Order } from './entities/order.entity';
 
@@ -12,12 +12,11 @@ export class OrdersService {
   constructor(
     @InjectRepository(Order)
     private readonly orderRepository: Repository<Order>,
-
     @InjectRepository(OrderItem)
     private readonly orderItemRepository: Repository<OrderItem>,
-    @Inject('USERS_MICROSERVICE')
+    @Inject(SERVICES.USERS.name)
     private readonly usersMicroservice: ClientProxy,
-    @Inject('PRODUCTS_MICROSERVICE')
+    @Inject(SERVICES.PRODUCTS.name)
     private readonly productMicroservice: ClientProxy,
   ) {}
   async create(createOrderDto: CreateOrderDto) {
@@ -77,10 +76,11 @@ export class OrdersService {
     }
   }
 
+
   async findOne(id: number) {
     const order = await this.orderRepository.findOne({
       where: { id },
-      relations: ['items', 'items.product'],
+      relations: ['user', 'items', 'items.product'],
     });
 
     if (!order) {

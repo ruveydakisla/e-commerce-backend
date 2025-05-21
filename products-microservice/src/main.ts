@@ -1,3 +1,4 @@
+import { SERVICES } from '@my/common/src/common/constants';
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { AppModule } from './app.module';
@@ -8,7 +9,7 @@ async function bootstrap() {
     {
       transport: Transport.TCP,
       options: {
-        port: 3022,
+        port: SERVICES.PRODUCTS.port,
         host: '0.0.0.0',
       },
     },
