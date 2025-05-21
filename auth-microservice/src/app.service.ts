@@ -1,15 +1,16 @@
+import { LoginDto } from '@my/common/src/auth/dto';
+import { JwtPayload } from '@my/common/src/auth/types';
+import { SERVICES } from '@my/common/src/common/constants';
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
-import { LoginDto } from './dto/login.dto';
-import { JwtPayload } from './utils/types';
 
 @Injectable()
 export class AuhtService {
   constructor(
     private readonly jwtService: JwtService,
-    @Inject('USERS_MICROSERVICE')
+    @Inject(SERVICES.USERS.name)
     private readonly usersMicroservice: ClientProxy,
   ) {}
 
@@ -23,7 +24,6 @@ export class AuhtService {
         throw new UnauthorizedException('Kullanıcı bulunamadı.');
       }
 
-    
       if (password !== user.password) {
         throw new UnauthorizedException('Geçersiz şifre');
       }

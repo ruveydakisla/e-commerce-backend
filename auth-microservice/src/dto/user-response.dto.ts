@@ -1,4 +1,4 @@
-import { UserRole } from 'src/utils/types';
+import { UserRole } from '@my/common/src/users/constants';
 
 export class UserResponseDto {
   sub: number;
@@ -11,14 +11,4 @@ export class UserResponseDto {
     Object.assign(this, partial);
   }
   role: UserRole;
-}
-
-export class UserDto {
-  sub: number;
-  email: string;
-  password: string;
-  role:UserRole
-  constructor(partial: Partial<UserDto>) {
-    Object.assign(this, partial);
-  }
 }
