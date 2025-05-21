@@ -70,7 +70,10 @@ export class ProductsService {
       throw new NotFoundException(`Ürün bulunamadı: ${id}`);
     }
 
-    return result;
+    return {
+      ...updatedProduct,
+      id,
+    };
   }
 
   async remove(id: number) {
