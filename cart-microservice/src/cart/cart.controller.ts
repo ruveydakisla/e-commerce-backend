@@ -1,16 +1,15 @@
+import { AddCartDto, UpdateCartDto } from '@my/common/src/cart/dto';
 import { CART_PATTERNS } from '@my/common/src/common/constants';
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CartService } from './cart.service';
-import { CreateCartDto } from './dto/create-cart.dto';
-import { UpdateCartDto } from './dto/update-cart.dto';
 
 @Controller()
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
   @MessagePattern({ cmd: CART_PATTERNS.addToCart })
-  create(@Payload() createCartDto: CreateCartDto) {
+  create(@Payload() createCartDto: AddCartDto) {
     return this.cartService.addToCart(createCartDto);
   }
 

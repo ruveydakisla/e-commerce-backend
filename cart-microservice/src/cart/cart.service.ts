@@ -1,20 +1,17 @@
+import { AddCartDto, UpdateCartDto } from '@my/common/src/cart/dto';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CreateCartDto } from './dto/create-cart.dto';
-import { UpdateCartDto } from './dto/update-cart.dto';
 import { Cart, CartDocument } from './schema/cart.schema';
 
 @Injectable()
 export class CartService {
   constructor(
     @InjectModel(Cart.name) private cartModel: Model<CartDocument>,
-    // private productService: ProductsService,
   ) {}
-  async addToCart(dto: CreateCartDto) {
+  async addToCart(dto: AddCartDto) {
     const cart = await this.cartModel.findOne({ userId: dto.userId });
     if (!cart) {
-      // Yeni sepet oluştur
       return this.cartModel.create({
         userId: dto.userId,
         items: [
@@ -42,7 +39,6 @@ export class CartService {
     }
     return cart.save();
   }
-
 
   async findOne(userId: number) {
     const cart = await this.cartModel.findOne({ userId });
@@ -72,7 +68,7 @@ export class CartService {
     return cart.save();
   }
 
-    clearCart(userId: number) {
+  clearCart(userId: number) {
     return this.cartModel.deleteOne({ userId });
   }
   async removeItemFromCart(userId: number, productId: number) {
