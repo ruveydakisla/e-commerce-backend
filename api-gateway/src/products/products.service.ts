@@ -1,9 +1,9 @@
+import { PRODUCTS_PATTERNS } from '@my/common/src/common/constants';
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { PaginationOptions } from 'src/users/utils/types';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { PRODUCTS_PATTERNS } from './utils/types';
 
 @Injectable()
 export class ProductsService {

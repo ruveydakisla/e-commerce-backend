@@ -1,9 +1,9 @@
+import { CART_PATTERNS } from '@my/common/src/common/constants';
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CartService } from './cart.service';
 import { CreateCartDto } from './dto/create-cart.dto';
 import { UpdateCartDto } from './dto/update-cart.dto';
-import { CART_PATTERNS } from './utils/types';
 
 @Controller()
 export class CartController {

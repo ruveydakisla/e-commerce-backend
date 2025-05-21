@@ -1,7 +1,7 @@
+import { AUTH_PATTERNS } from '@my/common/src/common/constants';
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { LoginDto } from './dto/login.dto';
-import { AUTH_PATTERNS } from './utils/types';
 
 @Injectable()
 export class AuthService {

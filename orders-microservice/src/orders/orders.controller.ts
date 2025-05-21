@@ -1,9 +1,9 @@
+import { ORDERS_PATTERNS } from '@my/common/src/common/constants';
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrdersService } from './orders.service';
-import { ORDERS_PATTERNS } from './utils/types';
 
 @Controller()
 export class OrdersController {

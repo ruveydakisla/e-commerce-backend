@@ -1,8 +1,9 @@
+import { USER_PATTERNS } from '@my/common/src/common/constants';
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { PaginationOptions, USER_PATTERNS } from './utils/types';
+import { PaginationOptions } from './utils/types';
 
 @Injectable()
 export class UsersService {

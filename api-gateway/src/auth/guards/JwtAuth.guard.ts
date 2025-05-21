@@ -1,3 +1,4 @@
+import { AUTH_PATTERNS } from '@my/common/src/common/constants';
 import {
   CanActivate,
   ExecutionContext,
@@ -6,7 +7,6 @@ import {
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
-import { AUTH_PATTERNS } from '../utils/types';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
