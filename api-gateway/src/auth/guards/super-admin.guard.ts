@@ -1,4 +1,4 @@
-
+import { RequestWithUser } from '@my/common/src/auth/types';
 import {
   CanActivate,
   ExecutionContext,
@@ -6,7 +6,6 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { UserRole } from 'src/users/utils/types';
-import { RequestWithUser } from '../utils/types';
 
 @Injectable()
 export class SuperAdminGuard implements CanActivate {
