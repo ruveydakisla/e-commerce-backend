@@ -25,8 +25,11 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
-  @Roles(UserRole.ADMIN, UserRole.SELLER)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.SELLER)
   create(@Body() createProductDto: CreateProductDto) {
+
+
     return this.productsService.create(createProductDto);
   }
 
@@ -41,8 +44,8 @@ export class ProductsController {
   }
 
   @Patch(':id')
-  @UseGuards(AdminGuard)
-  @UseGuards(SuperAdminGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SELLER)
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateProductDto: UpdateProductDto,

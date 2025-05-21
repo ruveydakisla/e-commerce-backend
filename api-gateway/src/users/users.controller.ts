@@ -61,9 +61,11 @@ export class UsersController {
   }
 
   @Delete(':id')
-  @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.SELLER)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.SELLER)
   remove(@Param('id', ParseIntPipe) id: number) {
+
+
     return this.usersService.remove(id);
   }
 }
