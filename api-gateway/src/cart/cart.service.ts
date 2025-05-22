@@ -1,5 +1,4 @@
-import { AddCartDto, UpdateCartDto } from '@my/common/src/cart/dto';
-import { CART_PATTERNS } from '@my/common/src/common/constants';
+import { AddCartDto, CART_PATTERNS, UpdateCartDto } from '@my/common';
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 

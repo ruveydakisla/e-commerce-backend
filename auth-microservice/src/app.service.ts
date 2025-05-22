@@ -1,5 +1,4 @@
-import { LoginDto } from '@my/common/src/auth/dto';
-import { JwtPayload } from '@my/common/src/auth/types';
+import { JwtPayload, LoginDto } from '@my/common';
 import { SERVICES } from '@my/common/src/common/constants';
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';

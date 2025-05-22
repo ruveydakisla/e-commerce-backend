@@ -1,4 +1,4 @@
-import { AddCartDto, UpdateCartDto } from '@my/common/src/cart/dto';
+import { AddCartDto, UpdateCartDto } from '@my/common';
 import {
   Body,
   Controller,

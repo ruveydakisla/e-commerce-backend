@@ -1,11 +1,15 @@
-import { ORDERS_PATTERNS } from '@my/common/src/common/constants';
-import { CreateOrderDto, UpdateOrderDto } from '@my/common/src/orders/dto';
+import {
+  CreateOrderDto,
+  ORDERS_PATTERNS,
+  SERVICES,
+  UpdateOrderDto,
+} from '@my/common';
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 @Injectable()
 export class OrdersService {
   constructor(
-    @Inject('ORDERS_MICROSERVICE') private orderMicroservice: ClientProxy,
+    @Inject(SERVICES.ORDERS.name) private orderMicroservice: ClientProxy,
   ) {}
   create(createOrderDto: CreateOrderDto) {
     return this.orderMicroservice.send(

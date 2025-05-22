@@ -1,6 +1,9 @@
-import { PaginationOptions } from '@my/common/src/common/types';
-import { UserRole } from '@my/common/src/users/constants';
-import { CreateUserDto, UpdateUserDto } from '@my/common/src/users/dto';
+import {
+  CreateUserDto,
+  PaginationOptions,
+  UpdateUserDto,
+  UserRole,
+} from '@my/common';
 import {
   Body,
   Controller,

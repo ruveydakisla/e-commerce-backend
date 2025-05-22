@@ -1,5 +1,4 @@
-import { LoginDto } from '@my/common/src/auth/dto';
-import { AUTH_PATTERNS, SERVICES } from '@my/common/src/common/constants';
+import { AUTH_PATTERNS, LoginDto, SERVICES } from '@my/common';
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 

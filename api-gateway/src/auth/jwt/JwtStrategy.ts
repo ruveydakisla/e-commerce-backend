@@ -1,4 +1,4 @@
-import { JwtPayload } from '@my/common/src/auth/types';
+import { JwtPayload } from '@my/common';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';

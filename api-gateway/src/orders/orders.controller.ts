@@ -1,4 +1,4 @@
-import { CreateOrderDto, UpdateOrderDto } from '@my/common/src/orders/dto';
+import { CreateOrderDto, UpdateOrderDto } from '@my/common';
 import {
   Body,
   Controller,

@@ -1,9 +1,9 @@
-import { PaginationOptions } from '@my/common/src/common/types';
 import {
   CreateProductDto,
+  PaginationOptions,
   UpdateProductDto,
-} from '@my/common/src/products/dto';
-import { UserRole } from '@my/common/src/users/constants';
+  UserRole,
+} from '@my/common';
 import {
   Body,
   Controller,

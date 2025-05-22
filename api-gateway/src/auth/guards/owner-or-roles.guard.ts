@@ -1,5 +1,4 @@
-import { RequestWithUser } from '@my/common/src/auth/types';
-import { UserRole } from '@my/common/src/users/constants';
+import { RequestWithUser, UserRole } from '@my/common';
 import {
   CanActivate,
   ExecutionContext,

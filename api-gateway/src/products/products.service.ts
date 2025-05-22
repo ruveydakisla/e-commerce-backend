@@ -1,15 +1,16 @@
-import { PRODUCTS_PATTERNS } from '@my/common/src/common/constants';
-import { PaginationOptions } from '@my/common/src/common/types';
 import {
   CreateProductDto,
+  PaginationOptions,
+  PRODUCTS_PATTERNS,
+  SERVICES,
   UpdateProductDto,
-} from '@my/common/src/products/dto';
+} from '@my/common';
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 @Injectable()
 export class ProductsService {
   constructor(
-    @Inject('PRODUCTS_MICROSERVICE')
+    @Inject(SERVICES.PRODUCTS.name)
     private readonly productsMicroservice: ClientProxy,
   ) {}
   create(createProductDto: CreateProductDto) {

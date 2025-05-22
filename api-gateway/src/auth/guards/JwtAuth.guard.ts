@@ -1,4 +1,4 @@
-import { AUTH_PATTERNS } from '@my/common/src/common/constants';
+import { AUTH_PATTERNS } from '@my/common';
 import {
   CanActivate,
   ExecutionContext,

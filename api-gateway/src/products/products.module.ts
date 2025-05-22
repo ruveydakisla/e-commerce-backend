@@ -1,4 +1,4 @@
-import { SERVICES } from '@my/common/src/common/constants';
+import { SERVICES } from '@my/common';
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ProductsController } from './products.controller';
