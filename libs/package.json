@@ -1,5 +1,6 @@
 {
   "name": "@my/common",
+  "private": false,
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
@@ -21,7 +22,8 @@
   },
   "devDependencies": {
     "@types/node": "^22.15.21",
-    "standard-version": "^9.5.0"
+    "standard-version": "^9.5.0",
+    "typescript": "^5.8.3"
   },
   "dependencies": {
     "@nestjs/mapped-types": "^2.1.0",

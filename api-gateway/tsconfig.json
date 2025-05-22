@@ -11,7 +11,8 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "paths": {
-      "@my/common": ["../common/dist"]
+      "@my/common": ["../libs/dist"],
+      "@my/common/*": ["../libs/dist/*"]
     },
     "incremental": true,
     "skipLibCheck": true,
