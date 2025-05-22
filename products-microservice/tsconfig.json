@@ -17,8 +17,9 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
-      "paths": {
-      "@my/common/*": ["../libs/*"]
+    "paths": {
+      "@my/common": ["../libs/dist"],
+      "@my/common/*": ["../libs/dist/*"]
     }
   }
 }

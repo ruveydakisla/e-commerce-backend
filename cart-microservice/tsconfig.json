@@ -18,7 +18,8 @@
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@my/common/*": ["../libs/*"]
+      "@my/common": ["../libs/dist"],
+      "@my/common/*": ["../libs/dist/*"]
     }
   }
 }
