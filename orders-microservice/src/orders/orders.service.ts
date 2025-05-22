@@ -1,5 +1,4 @@
-import { SERVICES } from '@my/common/src/common/constants';
-import { CreateOrderDto, UpdateOrderDto } from '@my/common/src/orders/dto';
+import { CreateOrderDto, SERVICES, UpdateOrderDto } from '@my/common';
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -75,7 +74,6 @@ export class OrdersService {
       throw new Error('Orders could not be fetched');
     }
   }
-
 
   async findOne(id: number) {
     const order = await this.orderRepository.findOne({

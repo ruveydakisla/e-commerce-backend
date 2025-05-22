@@ -1,5 +1,5 @@
 import { JwtPayload, LoginDto } from '@my/common';
-import { SERVICES } from '@my/common/src/common/constants';
+import { SERVICES } from '@my/common';
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ClientProxy, RpcException } from '@nestjs/microservices';

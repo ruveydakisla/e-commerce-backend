@@ -1,12 +1,10 @@
 import {
+  CreateProductDto,
   PaginatedResult,
   PaginationOptions,
-} from '@my/common/src/common/types';
-import {
-  CreateProductDto,
+  SortOrder,
   UpdateProductDto,
-} from '@my/common/src/products/dto';
-import { SortOrder } from '@my/common/src/users/constants';
+} from '@my/common';
 import {
   HttpException,
   HttpStatus,

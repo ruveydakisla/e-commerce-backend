@@ -1,4 +1,4 @@
-import { UserRole } from '@my/common/src/users/constants';
+import { UserRole } from '@my/common';
 
 export class UserResponseDto {
   sub: number;

@@ -1,4 +1,4 @@
-import { SERVICES } from '@my/common/src/common/constants';
+import { SERVICES } from '@my/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';

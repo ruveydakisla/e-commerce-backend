@@ -1,6 +1,9 @@
-import { USER_PATTERNS } from '@my/common/src/common/constants';
-import { PaginationOptions } from '@my/common/src/common/types';
-import { CreateUserDto, UpdateUserDto } from '@my/common/src/users/dto';
+import {
+  CreateUserDto,
+  PaginationOptions,
+  UpdateUserDto,
+  USER_PATTERNS,
+} from '@my/common';
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { UsersService } from './users.service';

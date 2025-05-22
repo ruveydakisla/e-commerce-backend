@@ -1,4 +1,4 @@
-import { UserRole } from 'src/utils/types';
+import { UserRole } from '@my/common';
 import { Column, Entity } from 'typeorm';
 import { BaseEntityWithName } from './BaseEntityWithName';
 @Entity('users')

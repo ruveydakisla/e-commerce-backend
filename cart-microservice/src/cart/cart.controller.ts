@@ -1,5 +1,4 @@
-import { AddCartDto, UpdateCartDto } from '@my/common/src/cart/dto';
-import { CART_PATTERNS } from '@my/common/src/common/constants';
+import { AddCartDto, CART_PATTERNS, UpdateCartDto } from '@my/common';
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CartService } from './cart.service';

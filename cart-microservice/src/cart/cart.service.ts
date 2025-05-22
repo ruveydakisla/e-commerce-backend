@@ -1,4 +1,4 @@
-import { AddCartDto, UpdateCartDto } from '@my/common/src/cart/dto';
+import { AddCartDto, UpdateCartDto } from '@my/common';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -6,9 +6,7 @@ import { Cart, CartDocument } from './schema/cart.schema';
 
 @Injectable()
 export class CartService {
-  constructor(
-    @InjectModel(Cart.name) private cartModel: Model<CartDocument>,
-  ) {}
+  constructor(@InjectModel(Cart.name) private cartModel: Model<CartDocument>) {}
   async addToCart(dto: AddCartDto) {
     const cart = await this.cartModel.findOne({ userId: dto.userId });
     if (!cart) {

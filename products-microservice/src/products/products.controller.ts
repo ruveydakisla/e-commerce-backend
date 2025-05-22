@@ -1,9 +1,9 @@
-import { PRODUCTS_PATTERNS } from '@my/common/src/common/constants';
-import { PaginationOptions } from '@my/common/src/common/types';
 import {
   CreateProductDto,
+  PaginationOptions,
+  PRODUCTS_PATTERNS,
   UpdateProductDto,
-} from '@my/common/src/products/dto';
+} from '@my/common';
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { ProductsService } from './products.service';
