@@ -1,17 +1,21 @@
 import {
   CreateProductDto,
+  ORDER_KAFKA_EVENTS,
   PaginatedResult,
   PaginationOptions,
+  SERVICES,
   SortOrder,
   UpdateProductDto,
 } from '@my/common';
 import {
   HttpException,
   HttpStatus,
+  Inject,
   Injectable,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
+import { ClientKafka } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 import { ProductResponseDTO } from './dto/product-response.dto';
@@ -23,6 +27,8 @@ export class ProductsService {
     private readonly entityManager: EntityManager,
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
+    @Inject(SERVICES.KAFKA.name)
+    private readonly kafkaClient: ClientKafka, // Adjust type as necessary
   ) {}
   private readonly logger = new Logger(ProductsService.name);
 
@@ -109,6 +115,7 @@ export class ProductsService {
     }
 
     if (product.stock < quantity) {
+      await this.kafkaClient.emit(ORDER_KAFKA_EVENTS.STOCK_WARNING, productId);
       throw new HttpException(
         `Yetersiz stok: Ürün ID ${productId} | Mevcut: ${product.stock}, İstenen: ${quantity}`,
         HttpStatus.BAD_REQUEST,
