@@ -1,13 +1,19 @@
-import { CreateOrderDto, SERVICES, UpdateOrderDto } from '@my/common';
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import {
+  CreateOrderDto,
+  ORDER_KAFKA_EVENTS,
+  OrderCreatedEvent,
+  SERVICES,
+  UpdateOrderDto,
+} from '@my/common';
+import { Inject, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
+import { ClientKafka, ClientProxy } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { OrderItem } from './entities/order-item.entity';
 import { Order } from './entities/order.entity';
 
 @Injectable()
-export class OrdersService {
+export class OrdersService implements OnModuleInit{
   constructor(
     @InjectRepository(Order)
     private readonly orderRepository: Repository<Order>,
@@ -17,7 +23,13 @@ export class OrdersService {
     private readonly usersMicroservice: ClientProxy,
     @Inject(SERVICES.PRODUCTS.name)
     private readonly productMicroservice: ClientProxy,
+    @Inject(SERVICES.KAFKA.name) private readonly kafka: ClientKafka,
   ) {}
+
+  onModuleInit() {
+     this.kafka.connect();
+  }
+
   async create(createOrderDto: CreateOrderDto) {
     const { userId, orderItems, totalPrice } = createOrderDto;
     const user = this.usersMicroservice.send(
@@ -32,7 +44,7 @@ export class OrdersService {
       ...user,
       totalPrice,
     });
-    await this.orderRepository.save(order);
+    const savedOrder = await this.orderRepository.save(order);
 
     for (const item of orderItems) {
       const product = this.productMicroservice.send(
@@ -55,6 +67,18 @@ export class OrdersService {
 
       await this.orderItemRepository.save(orderItem);
     }
+    const newOrderCreatedEvent: OrderCreatedEvent = {
+      orderId: savedOrder.id,
+      userId: order.userId,
+      items: orderItems.map((item) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+      })),
+      totalPrice: savedOrder.totalPrice,
+    };
+    this.kafka.send(ORDER_KAFKA_EVENTS.ORDER_CREATED, {
+      value: newOrderCreatedEvent.toString(),
+    });
 
     // Siparişi geri döndürüyoruz
     return orderItems;
