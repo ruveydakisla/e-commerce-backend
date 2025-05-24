@@ -24,6 +24,11 @@ export const SERVICES = {
     host: "cart-microservice",
     port: 3024,
   },
+  KAFKA: {
+    name: "KAFKA_MICROSERVICE",
+    host: "kafka",
+    port: 9092,
+  },
 };
 export const USER_PATTERNS = {
   FindAll: "Users.FindAll",
