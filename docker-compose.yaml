@@ -287,4 +287,4 @@ volumes:
   my-common-dist:
   my-common-modules:
   orders-pg-db:
-  # mongo-data:
+  mongo-data:
