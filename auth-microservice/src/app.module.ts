@@ -1,3 +1,4 @@
+import { SERVICES } from '@my/common';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
@@ -18,9 +19,9 @@ import { AuhtService } from './app.service';
     }),
     ClientsModule.register([
       {
-        name: 'USERS_MICROSERVICE',
+        name: SERVICES.USERS.name,
         transport: Transport.TCP,
-        options: { port: 3020, host: 'users-microservice' },
+        options: { port: SERVICES.USERS.port, host: SERVICES.USERS.host },
       },
     ]),
   ],
