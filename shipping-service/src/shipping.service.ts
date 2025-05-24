@@ -1,4 +1,4 @@
-import { OrderCreatedEvent, SERVICES } from '@my/common';
+import { ORDER_KAFKA_EVENTS, OrderCreatedEvent, SERVICES } from '@my/common';
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
 import { ShippingRecord, ShippingStatus } from './utils/types';
@@ -23,7 +23,10 @@ export class ShippingService implements OnModuleInit {
     };
 
     this.shippingStore[orderCreatedEvent.orderId] = shippingRecord;
-    await this.kafkaClient.emit('order_shipping_created', shippingRecord);
+    await this.kafkaClient.emit(
+      ORDER_KAFKA_EVENTS.ORDER_SHIPPING_CREATED,
+      shippingRecord,
+    );
     console.log('Shipping record created:', shippingRecord);
 
     return shippingRecord;
