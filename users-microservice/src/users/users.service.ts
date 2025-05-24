@@ -1,5 +1,6 @@
 import {
   CreateUserDto,
+  CustomException,
   PaginationOptions,
   UpdateUserDto,
   UserRole,
@@ -70,10 +71,12 @@ export class UsersService {
     } catch (error) {
       if (error instanceof EntityNotFoundError) {
         // Kullanıcı bulunamadığında, NotFoundException yerine RpcException döndürelim
-        throw new RpcException({
-          status: 'error',
-          message: `Kullanıcı bulunamadı. ID: ${id}`,
-        });
+        throw new CustomException(
+          'Kullanıcı bulunamadı',
+          HttpStatus.NOT_FOUND,
+          'USER_NOT_FOUND',
+          { id },
+        );
       }
 
       // Diğer hatalar için genel bir mesaj döndür
