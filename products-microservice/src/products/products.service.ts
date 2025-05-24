@@ -91,4 +91,35 @@ export class ProductsService {
     }
     return product;
   }
+
+  async decreaseStock(productId: number, quantity: number): Promise<Product> {
+    const product = await this.productRepository.findOne({
+      where: { id: productId },
+    });
+
+    if (!product) {
+      throw new NotFoundException(`Ürün bulunamadı. ID: ${productId}`);
+    }
+
+    if (typeof product.stock !== 'number') {
+      throw new HttpException(
+        `Ürün stok bilgisi geçersiz. Ürün ID: ${productId}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    if (product.stock < quantity) {
+      throw new HttpException(
+        `Yetersiz stok: Ürün ID ${productId} | Mevcut: ${product.stock}, İstenen: ${quantity}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    product.stock -= quantity;
+    const updatedProduct = await this.productRepository.save(product);
+    this.logger.log(
+      `Stok güncellendi: Ürün ID ${productId} | Yeni stok: ${updatedProduct.stock}`,
+    );
+    return updatedProduct;
+  }
 }

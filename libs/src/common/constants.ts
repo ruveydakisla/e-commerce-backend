@@ -44,6 +44,7 @@ export const PRODUCTS_PATTERNS = {
   Create: "Products.Create",
   Update: "Products.Update",
   Remove: "Products.Remove",
+  DecreaseStock: "Products.DecreaseStock",
 };
 
 export const AUTH_PATTERNS = {

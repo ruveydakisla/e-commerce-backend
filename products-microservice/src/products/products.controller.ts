@@ -1,11 +1,13 @@
 import {
   CreateProductDto,
+  OrderCreatedEvent,
   PaginationOptions,
   PRODUCTS_PATTERNS,
   UpdateProductDto,
 } from '@my/common';
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
+import { Product } from './entities/product.entity';
 import { ProductsService } from './products.service';
 
 @Controller()
@@ -47,5 +49,20 @@ export class ProductsController {
   @MessagePattern({ cmd: PRODUCTS_PATTERNS.Remove })
   remove(@Payload() id: number) {
     return this.productsService.remove(id);
+  }
+
+  @MessagePattern({ cmd: PRODUCTS_PATTERNS.DecreaseStock })
+  async decreaseStock(@Payload() orderCreatedEvent: OrderCreatedEvent) {
+    const results: Product[] = [];
+
+    for (const item of orderCreatedEvent.items) {
+      const result = await this.productsService.decreaseStock(
+        item.productId,
+        item.quantity,
+      );
+      results.push(result);
+    }
+
+    return results;
   }
 }
