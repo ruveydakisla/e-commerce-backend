@@ -1,5 +1,7 @@
+import { SERVICES } from '@my/common';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -26,6 +28,18 @@ import { OrdersModule } from './orders/orders.module';
       }),
     }),
     OrdersModule,
+    ClientsModule.register([
+      {
+        name: SERVICES.KAFKA.name,
+        transport: Transport.KAFKA,
+        options: {
+          client: {
+            clientId: 'orders',
+            brokers: [`${SERVICES.KAFKA.host}:${SERVICES.KAFKA.port}`],
+          },
+        },
+      },
+    ]),
   ],
   controllers: [AppController],
   providers: [AppService],
