@@ -8,6 +8,9 @@ import { CartModule } from './cart/cart.module';
 @Module({
   imports: [
     CartModule,
+    ConfigModule.forRoot({
+      isGlobal: true, // config tüm uygulamada geçerli olsun
+    }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
 
