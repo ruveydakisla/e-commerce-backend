@@ -12,6 +12,7 @@ async function bootstrap() {
     },
   );
   await app.listen();
-  console.log('Auth microservice runnning on 3021...');
+
+  console.log(`auth microservice is running on port ${SERVICES.AUTH.port}`);
 }
 bootstrap();
