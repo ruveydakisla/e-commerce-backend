@@ -1,8 +1,9 @@
 import { SERVICES } from '@my/common';
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { UsersModule } from 'src/users/users.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { AdminGuard } from './guards/admin.guard';
@@ -12,6 +13,7 @@ import { SuperAdminGuard } from './guards/super-admin.guard';
 @Module({
   controllers: [AuthController],
   imports: [
+    forwardRef(() => UsersModule), // This is to avoid circular dependency issues
     ConfigModule.forRoot({ isGlobal: true }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
