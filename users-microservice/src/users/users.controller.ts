@@ -10,7 +10,6 @@ import { UsersService } from './users.service';
 @Controller()
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
-
   @MessagePattern({ cmd: USER_PATTERNS.Create })
   create(@Payload() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
@@ -27,10 +26,6 @@ export class UsersController {
   }
   @MessagePattern({ cmd: USER_PATTERNS.FindByEmail })
   findByEmail(@Payload() { email }: { email: string }) {
-    console.log('users-microservice');
-    console.log(email);
-    console.log(typeof email);
-
     return this.usersService.findByEmail(email);
   }
 
@@ -39,10 +34,8 @@ export class UsersController {
     @Payload()
     { id, updateUserDto }: { id: number; updateUserDto: UpdateUserDto },
   ) {
-    console.log('users-microservice->controller id:', id, 'typeof:', typeof id);
     return this.usersService.update(id, updateUserDto);
   }
-
   @MessagePattern({ cmd: USER_PATTERNS.Remove })
   remove(@Payload() { id }: { id: number }) {
     return this.usersService.remove(id);
