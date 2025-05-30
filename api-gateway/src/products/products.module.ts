@@ -1,6 +1,9 @@
 import { SERVICES } from '@my/common';
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { AuthModule } from 'src/auth/auth.module';
 import { ProductsController } from './products.controller';
 import { ProductsService } from './products.service';
 
@@ -8,6 +11,16 @@ import { ProductsService } from './products.service';
   controllers: [ProductsController],
   providers: [ProductsService],
   imports: [
+    AuthModule,
+    ConfigModule.forRoot({ isGlobal: true }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET')!,
+        signOptions: { expiresIn: '1d' },
+      }),
+    }),
     ClientsModule.register([
       {
         name: SERVICES.PRODUCTS.name,

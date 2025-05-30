@@ -1,20 +1,26 @@
 import { SERVICES } from '@my/common';
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { UsersModule } from 'src/users/users.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { AdminGuard } from './guards/admin.guard';
 import { JwtAuthGuard } from './guards/JwtAuth.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { SuperAdminGuard } from './guards/super-admin.guard';
-import { JwtStrategy } from './jwt/JwtStrategy';
 @Module({
   controllers: [AuthController],
   imports: [
-    ConfigModule.forRoot(),
-    UsersModule,
+    ConfigModule.forRoot({ isGlobal: true }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET')!,
+        signOptions: { expiresIn: '1d' },
+      }),
+    }),
     ClientsModule.register([
       {
         name: SERVICES.AUTH.name,
@@ -27,7 +33,6 @@ import { JwtStrategy } from './jwt/JwtStrategy';
     AuthService,
     AdminGuard,
     SuperAdminGuard,
-    JwtStrategy,
     JwtAuthGuard,
     RolesGuard,
   ],
