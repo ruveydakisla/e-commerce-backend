@@ -1,5 +1,5 @@
 import { SERVICES } from '@my/common';
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { ClientsModule, Transport } from '@nestjs/microservices';
@@ -12,7 +12,7 @@ import { UsersService } from './users.service';
   controllers: [UsersController],
   providers: [UsersService, AuthService],
   imports: [
-    AuthModule,
+    forwardRef(() => AuthModule), // This is to avoid circular dependency issues
     ConfigModule.forRoot({ isGlobal: true }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
