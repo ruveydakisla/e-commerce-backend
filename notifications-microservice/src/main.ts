@@ -14,7 +14,7 @@ async function bootstrap() {
           brokers: [`${SERVICES.KAFKA.host}:${SERVICES.KAFKA.port}`],
         },
         consumer: {
-          groupId: 'stock-consumer',
+          groupId: 'notification-consumer',
         },
       },
     },
