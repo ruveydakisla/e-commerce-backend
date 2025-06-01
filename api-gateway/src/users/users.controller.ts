@@ -11,8 +11,8 @@ import {
   Get,
   Param,
   ParseIntPipe,
-  Patch,
   Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -42,7 +42,7 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   @UseGuards(OwnerOrRolesGuard)
   @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   update(
@@ -52,10 +52,10 @@ export class UsersController {
     return this.usersService.update(id, updateUserDto);
   }
 
-  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   @Delete(':id')
-  @Roles(UserRole.SUPER_ADMIN, UserRole.SELLER)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   remove(@Param('id', ParseIntPipe) id: number) {
+
     return this.usersService.remove(id);
   }
 }

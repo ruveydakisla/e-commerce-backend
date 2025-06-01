@@ -1,6 +1,7 @@
 import {
   CreateUserDto,
   CustomException,
+  PaginatedResult,
   PaginationOptions,
   UpdateUserDto,
   UserRole,
@@ -8,13 +9,15 @@ import {
 import {
   HttpException,
   HttpStatus,
+  Inject,
   Injectable,
-  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { EntityManager, EntityNotFoundError, Repository } from 'typeorm';
+import { Logger } from 'winston';
 import { UserResponseDto } from './dto/user-response.dto';
 import { User } from './entities/user.entity';
 
@@ -23,14 +26,16 @@ export class UsersService {
   constructor(
     private readonly entityManager: EntityManager,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
-  private readonly logger = new Logger(UsersService.name);
-  async create(CreateUserDto: CreateUserDto) {
-    const newUser = new User(CreateUserDto);
+
+  async create(createUserDto: CreateUserDto) {
+    const newUser = new User(createUserDto);
     const savedUser = await this.entityManager.save(User, newUser);
-    this.logger.log(`kullanıcı oluşturuldu:${savedUser.id}`);
+    this.logger.info(`User created successfully. ID: ${savedUser.id}`);
     return savedUser;
   }
+
   async findAll({
     limit = 5,
     order = 'asc',
@@ -44,7 +49,12 @@ export class UsersService {
       .skip(offset)
       .take(limit)
       .getMany();
-    return users.map(
+
+    this.logger.info(
+      `Fetched ${users.length} users (page: ${page}, limit: ${limit})`,
+    );
+
+    const data = users.map(
       (user) =>
         new UserResponseDto({
           id: user.id,
@@ -53,6 +63,14 @@ export class UsersService {
           birthDate: user.birthdate,
         }),
     );
+
+    const usersResponse: PaginatedResult<UserResponseDto> = {
+      data: data,
+      total: await this.userRepository.count(),
+      page: page,
+      limit: limit,
+    };
+    return usersResponse;
   }
 
   async findOne(id: number): Promise<UserResponseDto> {
@@ -60,6 +78,8 @@ export class UsersService {
       const user = await this.userRepository.findOneOrFail({
         where: { id },
       });
+
+      this.logger.info(`User found. ID: ${user.id}`);
 
       return new UserResponseDto({
         id: user.id,
@@ -70,49 +90,54 @@ export class UsersService {
       });
     } catch (error) {
       if (error instanceof EntityNotFoundError) {
-        // Kullanıcı bulunamadığında, NotFoundException yerine RpcException döndürelim
+        this.logger.warn(`User not found. ID: ${id}`);
         throw new CustomException(
-          'Kullanıcı bulunamadı',
+          'User not found',
           HttpStatus.NOT_FOUND,
           'USER_NOT_FOUND',
           { id },
         );
       }
 
-      // Diğer hatalar için genel bir mesaj döndür
-      console.error(`Kullanıcı aranırken hata oluştu: ${error.message}`);
+      this.logger.error(
+        `Error occurred while fetching user. ID: ${id}, Error: ${error.message}`,
+      );
       throw new RpcException({
         status: 'error',
-        message: 'Bir hata oluştu, lütfen tekrar deneyiniz.',
+        message: 'An unexpected error occurred while fetching user.',
       });
     }
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    this.logger.log(`finding user by email: ${email}`);
+    this.logger.info(`Searching user by email: ${email}`);
     const user = await this.userRepository.findOne({ where: { email } });
 
     if (!user) {
-      this.logger.log(`user not found ! email: ${email}`);
-
+      this.logger.warn(`User not found for email: ${email}`);
       throw new RpcException({
         status: 'error',
-        message: `Kullanıcı bulunamadı. Email: ${email}`,
+        message: `User not found for email: ${email}`,
         statusCode: 404,
       });
     }
 
+    this.logger.info(`User found by email: ${email}, ID: ${user.id}`);
     return user;
   }
+
   async update(
     id: number,
     updatedUser: UpdateUserDto,
   ): Promise<UserResponseDto> {
-    const user = this.findOne(id);
+    const user = await this.findOne(id);
     if (!user) {
-      throw new NotFoundException(`Kullanıcı bulunamadı: ${id}`);
+      this.logger.warn(`User not found for update. ID: ${id}`);
+      throw new NotFoundException(`User not found: ${id}`);
     }
-    const result = await this.userRepository.update(id, updatedUser);
+
+    await this.userRepository.update(id, updatedUser);
+    this.logger.info(`User updated successfully. ID: ${id}`);
 
     const userResponse = new UserResponseDto({
       id: id,
@@ -124,14 +149,20 @@ export class UsersService {
   }
 
   async remove(id: number) {
-    const user = this.findOne(id);
+    const user = await this.findOne(id);
     if (!user) {
+      this.logger.warn(`User not found for deletion. ID: ${id}`);
       throw new HttpException('User Not Found', HttpStatus.BAD_REQUEST);
     }
+
     const result = await this.userRepository.delete(id);
+
     if (result.affected === 0) {
-      throw new NotFoundException(`Kullanıcı bulunamadı. ID: ${id}`);
+      this.logger.error(`User deletion failed. ID: ${id}`);
+      throw new NotFoundException(`User could not be deleted. ID: ${id}`);
     }
-    return user;
+
+    this.logger.info(`User deleted successfully. ID: ${id}`);
+    return { message: `User deleted successfully. ID: ${id}` };
   }
 }
