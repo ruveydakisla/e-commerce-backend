@@ -16,7 +16,7 @@ export class OwnerOrRolesGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<RequestWithUser>();
     const user = request.user;
     const paramId = Number(request.params.id);
-
+ 
     if (!user) throw new ForbiddenException('Kullanıcı doğrulanamadı');
 
     const allowedRoles = this.reflector.getAllAndOverride<UserRole[]>(
@@ -25,7 +25,7 @@ export class OwnerOrRolesGuard implements CanActivate {
     );
 
     const isRoleAllowed = user.role && allowedRoles?.includes(user.role);
-    const isOwner = user.id === paramId;
+    const isOwner = user.sub === paramId;
 
     if (isOwner || isRoleAllowed) {
       return true;
