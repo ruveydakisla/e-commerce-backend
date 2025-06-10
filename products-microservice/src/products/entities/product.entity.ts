@@ -1,6 +1,6 @@
 import { Column, Entity, OneToMany } from 'typeorm';
-import { BaseEntityWithName } from './BaseEntityWithName';
 import { ProductImage } from './product-image.entity';
+import { BaseEntityWithName } from '@my/common';
 @Entity('products')
 export class Product extends BaseEntityWithName {
   @Column({ type: 'varchar', length: 255, unique: true })

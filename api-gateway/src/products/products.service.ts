@@ -1,9 +1,9 @@
 import {
-  CreateProductDto,
+  CreateProductDTO,
   PaginationOptions,
   PRODUCTS_PATTERNS,
   SERVICES,
-  UpdateProductDto,
+  UpdateProductDTO,
 } from '@my/common';
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
@@ -13,7 +13,7 @@ export class ProductsService {
     @Inject(SERVICES.PRODUCTS.name)
     private readonly productsMicroservice: ClientProxy,
   ) {}
-  create(createProductDto: CreateProductDto) {
+  create(createProductDto: CreateProductDTO) {
     return this.productsMicroservice.send(
       { cmd: PRODUCTS_PATTERNS.Create },
       createProductDto,
@@ -39,7 +39,7 @@ export class ProductsService {
     );
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
+  update(id: number, updateProductDto: UpdateProductDTO) {
     return this.productsMicroservice.send(
       { cmd: PRODUCTS_PATTERNS.Update },
       { id, updateProductDto },

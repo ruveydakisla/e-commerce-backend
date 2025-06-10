@@ -1,9 +1,9 @@
 import {
-  CreateProductDto,
+  CreateProductDTO,
   OrderCreatedEvent,
   PaginationOptions,
   PRODUCTS_PATTERNS,
-  UpdateProductDto,
+  UpdateProductDTO,
 } from '@my/common';
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
@@ -15,10 +15,7 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @MessagePattern({ cmd: PRODUCTS_PATTERNS.Create })
-  create(@Payload() createProductDto: CreateProductDto) {
-    console.log('product microserviceteyim ');
-    console.log(createProductDto);
-
+  create(@Payload() createProductDto: CreateProductDTO) {
     return this.productsService.create(createProductDto);
   }
 
@@ -39,7 +36,7 @@ export class ProductsController {
       updateProductDto,
       id,
     }: {
-      updateProductDto: UpdateProductDto;
+      updateProductDto: UpdateProductDTO;
       id: number;
     },
   ) {
