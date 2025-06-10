@@ -1,23 +1,24 @@
 import {
-  CreateProductDto,
+  CreateProductDTO,
   ORDER_KAFKA_EVENTS,
   PaginatedResult,
   PaginationOptions,
   SERVICES,
   SortOrder,
-  UpdateProductDto,
+  UpdateProductDTO,
 } from '@my/common';
 import {
   HttpException,
   HttpStatus,
   Inject,
   Injectable,
-  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { EntityManager, Repository } from 'typeorm';
+import { Logger } from 'winston';
 import { ProductResponseDTO } from './dto/product-response.dto';
 import { Product } from './entities/product.entity';
 
@@ -29,14 +30,14 @@ export class ProductsService {
     private readonly productRepository: Repository<Product>,
     @Inject(SERVICES.KAFKA.name)
     private readonly kafkaClient: ClientKafka, // Adjust type as necessary
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
-  private readonly logger = new Logger(ProductsService.name);
 
-  async create(createProductDto: CreateProductDto) {
+  async create(createProductDto: CreateProductDTO) {
     console.log(createProductDto);
     const newProduct = new Product(createProductDto);
     const savedProduct = await this.entityManager.save(Product, newProduct);
-    this.logger.log(`Ürün oluşturuldu:${savedProduct.id}`);
+    this.logger.info(`Product created: ${savedProduct.id}`);
     return savedProduct;
   }
 
@@ -44,13 +45,12 @@ export class ProductsService {
     params: PaginationOptions,
   ): Promise<PaginatedResult<ProductResponseDTO>> {
     const { limit = 10, order = 'asc', page = 1, sort = 'id' } = params;
-    console.log(params);
-    console.log('products service');
-
+    const safePage = Math.max(page, 1); // page 0 veya negatifse 1 olarak ayarlanır
+    this.logger.info('Fetching all products', { params });
     const [products, total] = await this.productRepository.findAndCount({
       relations: ['images'],
       order: { [sort]: order.toUpperCase() as SortOrder },
-      skip: (page - 1) * limit,
+      skip: (safePage - 1) * limit,
       take: limit,
     });
 
@@ -69,17 +69,27 @@ export class ProductsService {
     });
 
     if (!product) {
-      throw new NotFoundException(`Ürün bulunamadı. ID: ${id}`);
+      this.logger.warn(`Product not found. ID: ${id}`);
+      throw new NotFoundException(`Product not found. ID: ${id}`);
     }
+
     return product;
   }
 
-  async update(id: number, updatedProduct: UpdateProductDto) {
+  async update(id: number, updatedProduct: UpdateProductDTO) {
+    console.log(updatedProduct);
+    const product = await this.productRepository.findOne({
+      where: { id },
+    });
+    if (!product) {
+      this.logger.warn(`Product not found for update. ID: ${id}`);
+      throw new NotFoundException(`Product not found: ${id}`);
+    }
     const result = await this.productRepository.update(id, updatedProduct);
     if (result.affected === 0) {
-      throw new NotFoundException(`Ürün bulunamadı: ${id}`);
+      throw new NotFoundException(`Product not found: ${id}`);
     }
-
+    this.logger.info(`Product updated. ID: ${id}`, { updatedProduct });
     return {
       ...updatedProduct,
       id,
@@ -89,13 +99,17 @@ export class ProductsService {
   async remove(id: number) {
     const product = this.findOne(id);
     if (!product) {
+      this.logger.warn(`Product not found for deletion. ID: ${id}`);
       throw new HttpException('Product Not Found', HttpStatus.BAD_REQUEST);
     }
-    const result = await this.productRepository.delete(id);
-    if (result.affected === 0) {
-      throw new NotFoundException(`Product Not Found. ID: ${id}`);
+    try {
+      await this.productRepository.delete(id);
+      this.logger.info(`Product deleted. ID: ${id}`);
+      return product;
+    } catch (error) {
+      this.logger.error(`Product deletion failed. ID: ${id}`, error);
+      throw new NotFoundException(`Product couldn't delete. ID: ${id}`);
     }
-    return product;
   }
 
   async decreaseStock(productId: number, quantity: number): Promise<Product> {
@@ -104,10 +118,14 @@ export class ProductsService {
     });
 
     if (!product) {
-      throw new NotFoundException(`Ürün bulunamadı. ID: ${productId}`);
+      this.logger.warn(
+        `Product not found for stock decrease. ID: ${productId}`,
+      );
+      throw new NotFoundException(`Product not found. ID: ${productId}`);
     }
 
     if (typeof product.stock !== 'number') {
+      this.logger.error(`Invalid stock data. Product ID: ${productId}`);
       throw new HttpException(
         `Ürün stok bilgisi geçersiz. Ürün ID: ${productId}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -115,17 +133,20 @@ export class ProductsService {
     }
 
     if (product.stock < quantity) {
+      this.logger.warn(
+        `Insufficient stock. Product ID: ${productId}, Available: ${product.stock}, Requested: ${quantity}`,
+      );
       await this.kafkaClient.emit(ORDER_KAFKA_EVENTS.STOCK_WARNING, productId);
       throw new HttpException(
-        `Yetersiz stok: Ürün ID ${productId} | Mevcut: ${product.stock}, İstenen: ${quantity}`,
+        `Insufficient stock. Product ID: ${productId} | Available: ${product.stock}, Requested: ${quantity}`,
         HttpStatus.BAD_REQUEST,
       );
     }
 
     product.stock -= quantity;
     const updatedProduct = await this.productRepository.save(product);
-    this.logger.log(
-      `Stok güncellendi: Ürün ID ${productId} | Yeni stok: ${updatedProduct.stock}`,
+    this.logger.info(
+      `Stock updated. Product ID: ${productId}, New Stock: ${updatedProduct.stock}`,
     );
     return updatedProduct;
   }
