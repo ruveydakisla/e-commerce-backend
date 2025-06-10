@@ -1,38 +1,58 @@
-import { IsNotEmpty, IsOptional } from "class-validator";
+import { IsBoolean, IsDecimal, IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
-export class CreateProductDto {
+export class CreateProductDTO {
+  @IsString()
   @IsNotEmpty()
   name: string;
-  @IsOptional()
+
+  @IsString()
+  @IsNotEmpty()
   description: string;
+
+  @IsDecimal()
   @IsNotEmpty()
   price: number;
+
+  @IsInt()
   @IsOptional()
-  stock: number;
+  stock?: number;
+
+  @IsInt()
   @IsNotEmpty()
-  store_id: number;
-  @IsNotEmpty()
-  category_id: number;
+  seller_id: number;
+
+  @IsBoolean()
   @IsOptional()
-  rating: number;
-  @IsNotEmpty()
-  sell_count: number;
+  isActive?: boolean;
+
 }
-export class UpdateProductDto {
+
+export class UpdateProductDTO {
+  @IsString()
   @IsOptional()
-  name: string;
+  name?: string;
+
+  @IsString()
   @IsOptional()
-  description: string;
+  description?: string;
+
+  @IsDecimal()
   @IsOptional()
-  price: number;
+  price?: number;
+
+  @IsInt()
   @IsOptional()
-  stock: number;
+  stock?: number;
+
+  @IsInt()
   @IsOptional()
-  store_id: number;
+  seller_id?: number;
+
+  @IsBoolean()
   @IsOptional()
-  category_id: number;
+  isActive?: boolean;
+
+  @IsBoolean()
   @IsOptional()
-  rating: number;
-  @IsOptional()
-  sell_count: number;
+  isDeleted?: boolean;
 }

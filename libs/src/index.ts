@@ -11,5 +11,7 @@ export * from "./users/constants";
 export * from "./users/dto";
 
 //events
+export * from "./common/BaseEntity";
+export * from "./common/BaseEntityWithName";
 export * from "./events/order-created.event";
 export * from "./orders/types";
