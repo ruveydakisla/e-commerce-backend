@@ -1,4 +1,5 @@
 import { SERVICES } from '@my/common';
+import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
@@ -15,6 +16,13 @@ async function bootstrap() {
       transport: Transport.TCP,
       options: { port: SERVICES.USERS.port, host: '0.0.0.0' },
     },
+  );
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
   );
   await app.listen();
   console.log('Users microsevice 3020 portunda çalışıyor...');
