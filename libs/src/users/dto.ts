@@ -1,7 +1,10 @@
 import {
+  IsDateString,
   IsEmail,
+  IsEnum,
   IsNotEmpty,
   IsOptional,
+  IsString,
   IsStrongPassword,
 } from "class-validator";
 import { UserRole } from "./constants";
@@ -33,10 +36,13 @@ export class CreateUserDto {
 
 export class UpdateUserDto {
   @IsOptional()
-  name: string;
+  @IsString({ message: "Name must be a string" })
+  name?: string;
+
   @IsOptional()
-  @IsEmail()
-  email: string;
+  @IsEmail({}, { message: "Email must be a valid email address" })
+  email?: string;
+
   @IsOptional()
   @IsStrongPassword(
     {
@@ -48,12 +54,19 @@ export class UpdateUserDto {
     },
     {
       message:
-        "Password is not strong enough, it should have min 8 char, at least 1 upper case, 1 lower case, 1 number and 1 symbol",
+        "Password must be at least 8 characters long and include at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 symbol",
     }
   )
-  password: string;
+  password?: string;
+
   @IsOptional()
-  birthdate: Date;
+  @IsDateString(
+    {},
+    { message: "Birthdate must be a valid ISO date string (e.g. YYYY-MM-DD)" }
+  )
+  birthdate?: string;
+
   @IsOptional()
-  role: UserRole;
+  @IsEnum(UserRole, { message: "Role must be one of the defined user roles" })
+  role?: UserRole;
 }
