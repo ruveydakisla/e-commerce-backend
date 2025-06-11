@@ -1,28 +1,24 @@
-import { SERVICES } from '@my/common';
 import {
   CanActivate,
   ExecutionContext,
-  Inject,
   Injectable,
+  Logger,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
+    private readonly logger: Logger,
   ) {}
 
   async verify(token: string) {
     try {
-      console.log('auth microservice verify token', token);
       const verified = await this.jwtService.verify(token);
       return verified;
     } catch (e) {
-      console.log('jwt verify hatası', e);
-
-      return { message: 'jwt verify hatası', error: e };
+      return { message: 'jwt verify error', error: e };
     }
   }
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -41,8 +37,7 @@ export class JwtAuthGuard implements CanActivate {
         return false;
       }
     } catch (error) {
-      console.log('auth hatası:', error);
-
+      this.logger.error('JWT verification error:', error);
       return false;
     }
   }
