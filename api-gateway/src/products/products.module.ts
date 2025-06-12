@@ -13,7 +13,7 @@ import { ProductsController } from './products.controller';
 import { ProductsService } from './products.service';
 
 @Module({
-  controllers: [ProductsController, ProductSearchController],
+  controllers: [ProductSearchController, ProductsController],
   providers: [ProductsService, ProductSearchService],
   imports: [
     AuthModule,
