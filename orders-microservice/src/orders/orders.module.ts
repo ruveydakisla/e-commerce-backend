@@ -2,6 +2,8 @@ import { SERVICES } from '@my/common';
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { WinstonModule } from 'nest-winston';
+import { winstonLoggerConfig } from './common/logger';
 import { OrderItem } from './entities/order-item.entity';
 import { Order } from './entities/order.entity';
 import { OrderKafkaProducerService } from './order-kafka-producer.service';
@@ -11,6 +13,7 @@ import { OrdersService } from './orders.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Order, OrderItem]),
+    WinstonModule.forRoot(winstonLoggerConfig),
 
     ClientsModule.register([
       {
