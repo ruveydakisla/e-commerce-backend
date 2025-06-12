@@ -49,7 +49,9 @@ export class ProductsController {
   }
 
   @MessagePattern({ cmd: PRODUCTS_PATTERNS.DecreaseStock })
-  async decreaseStock(@Payload() orderCreatedEvent: OrderCreatedEvent) {
+  async decreaseStock(
+    @Payload() { orderCreatedEvent }: { orderCreatedEvent: OrderCreatedEvent },
+  ) {
     const results: Product[] = [];
 
     for (const item of orderCreatedEvent.items) {
