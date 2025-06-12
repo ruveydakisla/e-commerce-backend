@@ -5,7 +5,6 @@ import { Injectable } from '@nestjs/common';
 export class NotificationService {
   orderCreatedEventHandler(orderCreatedEvent: OrderCreatedEvent) {
     console.log('orderCreatedEvent', orderCreatedEvent);
-//order ile alakalı mail atılacak
     return 'Order Created';
   }
 }
