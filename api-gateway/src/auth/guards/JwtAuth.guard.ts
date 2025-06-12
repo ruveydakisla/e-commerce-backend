@@ -10,7 +10,6 @@ import { JwtService } from '@nestjs/jwt';
 export class JwtAuthGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly logger: Logger,
   ) {}
 
   async verify(token: string) {
@@ -37,7 +36,8 @@ export class JwtAuthGuard implements CanActivate {
         return false;
       }
     } catch (error) {
-      this.logger.error('JWT verification error:', error);
+      console.log(error);
+      
       return false;
     }
   }
