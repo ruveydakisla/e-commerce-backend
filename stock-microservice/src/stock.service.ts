@@ -4,11 +4,14 @@ import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class StockService {
-  constructor(@Inject(SERVICES.PRODUCTS.name) private readonly productClient: ClientProxy) {}
+  constructor(
+    @Inject(SERVICES.PRODUCTS.name) private readonly productClient: ClientProxy,
+  ) {}
 
   orderCreatedEventHandler(orderCreatedEvent: OrderCreatedEvent) {
-
-
-      return this.productClient.send(PRODUCTS_PATTERNS.DecreaseStock,{orderCreatedEvent});
+    return this.productClient.send(
+      { cmd: PRODUCTS_PATTERNS.DecreaseStock },
+      { orderCreatedEvent },
+    );
   }
 }
