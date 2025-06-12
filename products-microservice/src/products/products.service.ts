@@ -20,6 +20,7 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { EntityManager, Repository } from 'typeorm';
 import { Logger } from 'winston';
 import { ProductResponseDTO } from './dto/product-response.dto';
+import { ElasticsearchSyncService } from './elasticsearch/elasticsearch-sync.service';
 import { Product } from './entities/product.entity';
 
 @Injectable()
@@ -31,13 +32,25 @@ export class ProductsService {
     @Inject(SERVICES.KAFKA.name)
     private readonly kafkaClient: ClientKafka, // Adjust type as necessary
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+    @Inject()
+    private readonly elasticsearchSyncService: ElasticsearchSyncService,
   ) {}
 
   async create(createProductDto: CreateProductDTO) {
-    const newProduct = new Product(createProductDto);
-    const savedProduct = await this.entityManager.save(Product, newProduct);
-    this.logger.info(`Product created: ${savedProduct.id}`);
-    return savedProduct;
+    try {
+      console.log(createProductDto);
+
+      const newProduct = new Product(createProductDto);
+      const savedProduct = await this.entityManager.save(Product, newProduct);
+      await this.productRepository.save(newProduct);
+      await this.elasticsearchSyncService.indexProduct(newProduct);
+      this.logger.info(`Product created: ${savedProduct.id}`);
+      return savedProduct;
+    } catch (error) {
+      console.log("products mikroservisi ");
+      
+      console.log(error);
+    }
   }
 
   async findAll(
@@ -76,10 +89,10 @@ export class ProductsService {
   }
 
   async update(id: number, updatedProduct: UpdateProductDTO) {
-    console.log(updatedProduct);
     const product = await this.productRepository.findOne({
       where: { id },
     });
+
     if (!product) {
       this.logger.warn(`Product not found for update. ID: ${id}`);
       throw new NotFoundException(`Product not found: ${id}`);
@@ -88,6 +101,11 @@ export class ProductsService {
     if (result.affected === 0) {
       throw new NotFoundException(`Product not found: ${id}`);
     }
+    await this.productRepository.save(updatedProduct);
+    await this.elasticsearchSyncService.indexProduct({
+      ...product,
+      ...updatedProduct,
+    });
     this.logger.info(`Product updated. ID: ${id}`, { updatedProduct });
     return {
       ...updatedProduct,
@@ -104,6 +122,8 @@ export class ProductsService {
     try {
       await this.productRepository.delete(id);
       this.logger.info(`Product deleted. ID: ${id}`);
+      await this.elasticsearchSyncService.removeProduct(id);
+
       return product;
     } catch (error) {
       this.logger.error(`Product deletion failed. ID: ${id}`, error);
