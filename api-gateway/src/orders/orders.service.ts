@@ -18,8 +18,11 @@ export class OrdersService {
     );
   }
 
-  findAll() {
-    return this.orderMicroservice.send({ cmd: ORDERS_PATTERNS.FindAll }, {});
+  findAll(userId: number) {
+    return this.orderMicroservice.send(
+      { cmd: ORDERS_PATTERNS.FindAll },
+      userId,
+    );
   }
 
   findOne(id: number) {
