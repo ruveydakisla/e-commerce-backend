@@ -1,8 +1,10 @@
-import {  Column, Entity, OneToMany } from 'typeorm';
+import { BaseEntity } from '@my/common';
+import { Column, Entity, OneToMany } from 'typeorm';
 import { OrderItem } from './order-item.entity';
-import { BaseEntity } from './BaseEntity';
+
 @Entity('orders')
 export class Order extends BaseEntity {
+  @Column({ type: 'int' })
   userId: number;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })

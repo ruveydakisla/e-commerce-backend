@@ -1,8 +1,9 @@
-import {  Column, Entity, ManyToOne } from 'typeorm';
+import { BaseEntity } from '@my/common';
+import { Column, Entity, ManyToOne } from 'typeorm';
 import { Order } from './order.entity';
-import { BaseEntity } from './BaseEntity';
 @Entity('order_items')
 export class OrderItem extends BaseEntity {
+  @Column({ type: 'int'})
   productId: number;
 
   @ManyToOne(() => Order, (order) => order.items, { onDelete: 'CASCADE' })
