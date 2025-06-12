@@ -143,8 +143,11 @@ export class UsersService {
       id: id,
       name: updatedUser.name,
       email: updatedUser?.email,
-      birthDate: updatedUser?.birthdate,
+      birthDate: updatedUser?.birthdate
+        ? new Date(updatedUser.birthdate)
+        : undefined,
     });
+
     return userResponse;
   }
 
