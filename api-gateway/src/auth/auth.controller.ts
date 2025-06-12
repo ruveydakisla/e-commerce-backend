@@ -19,8 +19,6 @@ export class AuthController {
   @Get('me')
   findMe(@Req() req) {
     const sub = req.user.sub;
-    console.log(req.user);
-
     if (!sub) {
       return { message: 'User not found' };
     }

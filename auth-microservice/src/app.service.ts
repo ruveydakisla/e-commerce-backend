@@ -56,14 +56,8 @@ export class AuhtService {
       loginDto.email,
       loginDto.password,
     );
-    console.log(user);
 
     if (!user || loginDto.password !== user.password) {
-      console.log('logindto', loginDto.password);
-      console.log('user password', user.password);
-
-      console.log('Geçersiz e-posta veya şifre');
-
       throw new UnauthorizedException('Geçersiz e-posta veya şifre');
     }
     const payload: JwtPayload = {

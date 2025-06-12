@@ -34,7 +34,6 @@ export class ProductsService {
   ) {}
 
   async create(createProductDto: CreateProductDTO) {
-    console.log(createProductDto);
     const newProduct = new Product(createProductDto);
     const savedProduct = await this.entityManager.save(Product, newProduct);
     this.logger.info(`Product created: ${savedProduct.id}`);

@@ -16,13 +16,11 @@ export class RolesGuard implements CanActivate {
       ROLES_KEY,
       [context.getHandler(), context.getClass()],
     );
-    console.log(requiredRoles);
 
     if (!requiredRoles) return true;
     const { user } = context
       .switchToHttp()
       .getRequest<Request & { user: User }>();
-    console.log(user);
 
     if (!requiredRoles.includes(user.role)) {
       throw new ForbiddenException('Yetkiniz bulunmamaktadır.');
