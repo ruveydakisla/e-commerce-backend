@@ -6,6 +6,8 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AuthModule } from 'src/auth/auth.module';
 import { ProductsController } from './products.controller';
 import { ProductsService } from './products.service';
+import { CacheModule } from '@nestjs/cache-manager';
+import { redisStore } from 'cache-manager-redis-store';
 
 @Module({
   controllers: [ProductsController],
@@ -20,6 +22,14 @@ import { ProductsService } from './products.service';
         secret: configService.get<string>('JWT_SECRET')!,
         signOptions: { expiresIn: '1d' },
       }),
+    }),
+    CacheModule.register({
+      store: redisStore,
+      host: 'redis', // Docker Compose'daki Redis servisinin adı
+      port: 6379,
+      ttl: 3600, // Varsayılan cache ömrü saniye cinsinden (örn: 1 saat)
+      max: 100, // Cache'te tutulacak maksimum öğe sayısı (isteğe bağlı)
+      isGlobal: true, // CacheModule'ü global olarak kullanılabilir yapın
     }),
     ClientsModule.register([
       {

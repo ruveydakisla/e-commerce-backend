@@ -15,10 +15,12 @@ import {
   Post,
   Query,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { Roles } from 'src/auth/decorator/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/JwtAuth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { CustomCacheInterceptor } from 'src/common/interceptors/cache.interceptor';
 import { ProductsService } from './products.service';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('products')
@@ -32,10 +34,13 @@ export class ProductsController {
   }
 
   @Get()
+  @UseInterceptors(CustomCacheInterceptor)
   findAll(@Query() query: PaginationOptions) {
     return this.productsService.findAll(query);
   }
+
   @Get(':id')
+  @UseInterceptors(CustomCacheInterceptor)
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.productsService.findOne(id);
   }
