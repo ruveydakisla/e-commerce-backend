@@ -1,17 +1,20 @@
 import { SERVICES } from '@my/common';
+import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ElasticsearchModule } from '@nestjs/elasticsearch';
 import { JwtModule } from '@nestjs/jwt';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { redisStore } from 'cache-manager-redis-store';
 import { AuthModule } from 'src/auth/auth.module';
+import { ProductSearchController } from './products-search.controller';
+import { ProductSearchService } from './products-search.service';
 import { ProductsController } from './products.controller';
 import { ProductsService } from './products.service';
-import { CacheModule } from '@nestjs/cache-manager';
-import { redisStore } from 'cache-manager-redis-store';
 
 @Module({
-  controllers: [ProductsController],
-  providers: [ProductsService],
+  controllers: [ProductsController, ProductSearchController],
+  providers: [ProductsService, ProductSearchService],
   imports: [
     AuthModule,
     ConfigModule.forRoot({ isGlobal: true }),
@@ -22,6 +25,9 @@ import { redisStore } from 'cache-manager-redis-store';
         secret: configService.get<string>('JWT_SECRET')!,
         signOptions: { expiresIn: '1d' },
       }),
+    }),
+    ElasticsearchModule.register({
+      node: 'http://elasticsearch:9200',
     }),
     CacheModule.register({
       store: redisStore,
