@@ -86,9 +86,10 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - products-pg-db
+      - elasticsearch
     networks:
       - aye-network
-    environment:      
+    environment:
       KAFKA_HOST: ${KAFKA_HOST}
       KAFKA_PORT: ${KAFKA_PORT}
       PRODUCTS_POSTGRES_HOST: ${PRODUCTS_POSTGRES_HOST}
@@ -118,8 +119,8 @@ services:
       ORDERS_POSTGRES_DB: ${ORDERS_POSTGRES_DB}
       TYPEORM_CACHE_DURATION: ${TYPEORM_CACHE_DURATION}
     volumes:
-      - ./products-microservice:/app
-      - /app/node_modules
+      - ./orders-microservice:/usr/src/app/orders-microservice
+      - /usr/src/app/orders-microservice/node_modules
       - ./libs/dist:/usr/src/app/libs/dist
       - ./libs/node_modules:/usr/src/app/libs/node_modules
   auth-microservice:
@@ -150,6 +151,8 @@ services:
     volumes:
       - ./cart-microservice:/app
       - /app/node_modules
+      - ./libs/dist:/usr/src/app/libs/dist
+      - ./libs/node_modules:/usr/src/app/libs/node_modules
 
   mongo:
     image: mongo
@@ -181,9 +184,13 @@ services:
       - auth-microservice
       - products-microservice
       - my-common
+      - redis
+      - orders-microservice
+      - elasticsearch
+
+      
     env_file:
       - .env
-      # - orders-microservice
     environment:
       NODE_PATH: /usr/src/app=value
     volumes:
@@ -208,7 +215,6 @@ services:
       - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
     networks:
       - aye-network
-
 
   zookeeper:
     image: bitnami/zookeeper:latest
@@ -276,6 +282,28 @@ services:
       - /usr/src/app/stock-microservice/node_modules
       - ./libs/dist:/usr/src/app/libs/dist
       - ./libs/node_modules:/usr/src/app/libs/node_modules
+  elasticsearch:
+      image: docker.elastic.co/elasticsearch/elasticsearch:9.0.1
+      container_name: elasticsearch
+      environment:
+        - discovery.type=single-node
+        - xpack.security.enabled=false
+        - xpack.security.transport.ssl.enabled=false
+        - xpack.security.http.ssl.enabled=false
+      ports:
+          - "9200:9200"
+      volumes:
+          - esdata:/usr/share/elasticsearch/data
+      networks:
+          -  aye-network
+
+  redis:
+    image: redis:6.2-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - aye-network
 networks:
   aye-network:
     driver: bridge
@@ -288,3 +316,4 @@ volumes:
   my-common-modules:
   orders-pg-db:
   mongo-data:
+  esdata:
