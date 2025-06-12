@@ -1,6 +1,14 @@
 // create-order.dto.ts
 import { PartialType } from "@nestjs/mapped-types";
-import { IsArray, IsDecimal, IsInt, IsNotEmpty } from "class-validator";
+import { Type } from "class-transformer";
+import {
+  IsArray,
+  IsDecimal,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  ValidateNested,
+} from "class-validator";
 
 export class CreateOrderItemDto {
   @IsInt()
@@ -31,4 +39,18 @@ export class CreateOrderDto {
   @IsNotEmpty()
   totalPrice: number; // totalPrice için decimal validasyonu eklendi
 }
-export class UpdateOrderDto extends PartialType(CreateOrderDto) {}
+export class UpdateOrderDto extends PartialType(CreateOrderDto) {
+  @IsOptional()
+  @IsInt()
+  userId?: number;
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateOrderItemDto)
+  orderItems?: CreateOrderItemDto[];
+
+  @IsOptional()
+  @IsDecimal()
+  totalPrice?: number;
+}

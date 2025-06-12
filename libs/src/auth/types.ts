@@ -13,4 +13,6 @@ export interface RequestUser {
 export interface RequestWithUser extends Request {
   user?: RequestUser;
   params: { id: number };
+  query: Record<string, any>;
+  path: string;
 }
